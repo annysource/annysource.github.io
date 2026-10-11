@@ -19,7 +19,7 @@
 <body>
 <a class="skip" href="#conteudo">Pular para conteúdo</a>
 <header class="header shell">
-<a class="brand" href="{{ '/' | relative_url }}">Anny Sousa<span>creative technology · quality assurance</span></a>
+<a class="brand" href="{{ '/' | relative_url }}">Anny Sousa<span>Creative Technologist | Quality Engineer</span></a>
 <button class="menu-toggle" aria-expanded="false" aria-controls="navigation" hidden>Menu</button>
 <nav id="navigation" aria-label="Principal">
 {% for item in site.data.navigation %}<a href="{{ item.url | relative_url }}"{% if page.url contains item.url %} aria-current="page"{% endif %}>{{ item.title }}</a>{% endfor %}
@@ -27,7 +27,7 @@
 <div class="languages" aria-label="Idiomas"><a href="{{ '/' | relative_url }}" lang="pt-BR" aria-label="Português">PT</a><a href="{{ '/en/' | relative_url }}" lang="en" aria-label="English">EN</a><a href="{{ '/es/' | relative_url }}" lang="es" aria-label="Español">ES</a></div>
 </header>
 <main id="conteudo" class="shell">{{ content }}</main>
-<footer class="footer shell"><div class="footer-links"><span>© {{ 'now' | date: '%Y' }} Anny Caroline Sousa</span><a href="{{ site.linkedin_url }}">LinkedIn ↗</a>{% if site.email != "" %}<a href="mailto:{{ site.email }}">Contato</a>{% endif %}<a href="{{ '/feed.xml' | relative_url }}">RSS do Caderno</a></div>
+<footer class="footer shell"><div class="footer-links"><span>© {{ 'now' | date: '%Y' }} Anny Caroline</span><a href="{{ site.linkedin_url }}">LinkedIn ↗</a>{% if site.email != "" %}<a href="mailto:{{ site.email }}">Contato</a>{% endif %}<a href="{{ '/feed.xml' | relative_url }}">RSS do Caderno</a></div>
 {% include footer-game.html %}
 </footer>
 {% include lightbox.html %}
