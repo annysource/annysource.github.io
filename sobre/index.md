@@ -16,6 +16,7 @@ Games, XR, IA e tecnologias emergentes, com atenção à qualidade da experiênc
 ## Vamos conversar
 
 [Meu LinkedIn]({{ site.linkedin_url }})
+[Meu Perfil no Workana]({{ site.workana_url }})
 
 {% if site.email != "" %}[Enviar email](mailto:{{ site.email }}){% endif %}
 {% if site.cv_url != "" %}[Currículo]({{ site.cv_url | relative_url }}){% endif %}
