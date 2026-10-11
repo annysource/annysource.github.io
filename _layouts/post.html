@@ -1,0 +1,5 @@
+---
+layout: default
+---
+<article class="reading post"><a href="{{ '/caderno/' | relative_url }}">← Caderno</a><p class="eyebrow"><time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%d/%m/%Y' }}</time></p><h1>{{ page.title }}</h1>{{ content }}{% if page.gallery %}{% include gallery.html photos=page.gallery %}{% endif %}</article>
+

@@ -1,0 +1,5 @@
+---
+layout: default
+---
+<div class="library-layout"><aside class="sidebar"><p class="eyebrow">Índice do acervo</p><nav aria-label="Acervo"><a href="{{ '/pesquisa/' | relative_url }}">Pesquisa & publicações</a><a href="{{ '/acervo/#midia' | relative_url }}">Entrevistas & podcasts</a><a href="{{ '/acervo/#comunidade' | relative_url }}">Comunidade & eventos</a><a href="{{ '/acervo/#encontros' | relative_url }}">Encontros & bastidores</a><a href="{{ '/acervo/#reconhecimento' | relative_url }}">Prêmios & participações</a><a href="{{ '/caderno/' | relative_url }}">Caderno</a></nav></aside><article class="reading"><p class="eyebrow">{{ page.kicker }}</p>{% if page.url contains '/pesquisa/' %}<img class="section-icon " src="{{ '/assets/icons/research.svg' | relative_url }}" width="64" height="64" alt="" aria-hidden="true">{% elsif page.url contains '/acervo/' %}<img class="section-icon " src="{{ '/assets/icons/media.svg' | relative_url }}" width="64" height="64" alt="" aria-hidden="true">{% endif %}<h1>{{ page.title }}</h1>{{ content }}</article></div>
+

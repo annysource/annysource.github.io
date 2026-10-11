@@ -1,0 +1,5 @@
+<section class="photo-gallery" aria-label="Galeria de fotos">
+{% for photo in include.photos %}
+<figure><a data-gallery href="{{ photo.src | relative_url }}" data-caption="{{ photo.caption | escape }}" aria-label="Ampliar: {{ photo.alt | escape }}"><img src="{{ photo.src | relative_url }}" alt="{{ photo.alt | escape }}" loading="lazy" decoding="async"{% if photo.width %} width="{{ photo.width }}"{% endif %}{% if photo.height %} height="{{ photo.height }}"{% endif %}></a>{% if photo.caption %}<figcaption>{{ photo.caption | escape }}</figcaption>{% endif %}</figure>
+{% endfor %}
+</section>

@@ -1,0 +1,8 @@
+---
+layout: default
+title: Caderno
+description: Reflexões de Anny Caroline Sousa sobre XR, qualidade, IA e processo criativo.
+---
+<div class="notebook caderno-heading"><p class="eyebrow">Depois do expediente</p><h1 class="icon-heading"><img class="section-icon " src="{{ '/assets/icons/notebook.svg' | relative_url }}" width="64" height="64" alt="" aria-hidden="true"><span>Caderno</span></h1><p class="intro">O caderno que abro ao final de um dia de trabalho com realidades estendidas. Anotações sobre o que experimento, testo e aprendo.</p>{% if site.newsletter_url != "" %}<a class="button" href="{{ site.newsletter_url }}">Assinar a newsletter ↗</a>{% endif %}</div>
+<div class="library-layout"><aside class="sidebar"><p class="handwriting">Notas do dia</p><p>XR e presença<br>Qualidade e cuidado<br>IA e experimentação<br>Criação e pesquisa</p><a href="{{ '/feed.xml' | relative_url }}">Acompanhar por RSS →</a></aside><section class="reading"><h2>Últimas páginas</h2>{% for post in site.posts %}<article class="post-entry"><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: '%d/%m/%Y' }}</time><h3><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3><p>{{ post.excerpt | strip_html | truncate: 220 }}</p></article>{% else %}<p>As próximas edições serão reunidas aqui.</p>{% endfor %}</section></div>
+

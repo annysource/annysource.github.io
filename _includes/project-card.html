@@ -1,0 +1,5 @@
+<article class="project-card" data-category="{{ include.project.category }}">
+<a class="cover-link" href="{{ include.project.url | relative_url }}">{% if include.project.cover %}<img src="{{ include.project.cover | relative_url }}" alt="{{ include.project.cover_alt | default: include.project.title | escape }}" width="640" height="400" loading="lazy">{% else %}<div class="cover-placeholder icon-cover"><img src="{{ '/assets/icons/' | append: include.project.category | replace: 'autoria', 'projects' | replace: 'pesquisa', 'research' | append: '.svg' | relative_url }}" width="96" height="96" alt="" aria-hidden="true"><span>{{ include.project.area }}</span></div>{% endif %}</a>
+<div class="card-copy"><p class="eyebrow">{{ include.project.role }}</p><h3><a href="{{ include.project.url | relative_url }}">{{ include.project.title }}</a></h3><p>{{ include.project.summary }}</p><a class="text-link" href="{{ include.project.url | relative_url }}">Conhecer o trabalho →</a></div>
+</article>
+

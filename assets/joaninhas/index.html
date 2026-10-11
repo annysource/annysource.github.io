@@ -1,0 +1,8 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Joaninhas · jogo de rodapé</title><link rel="stylesheet" href="joaninhas.css"></head>
+<body><main class="widget">
+<header><span>JOANINHAS</span><div class="score"><span id="count">FILA 01</span><span id="distance">00000 m</span></div><button id="theme" aria-pressed="false" aria-label="Alternar tema">Tema escuro</button></header>
+<section class="game" aria-label="Jogo de joaninhas"><canvas id="game" width="900" height="190" tabindex="0" aria-label="Jogo: espaço ou seta para cima para pular. No celular, toque no jogo."></canvas><p id="status" role="status" aria-live="polite">Colete joaninhas. Pule com ↑, espaço ou toque.</p></section>
+<div class="controls"><button id="start">Jogar</button><button id="jump" disabled>Pular ↑</button><button id="pause" disabled aria-pressed="false">Pausar</button><span>5 pequenas → 1 grande · 2 iguais → 1 maior</span></div>
+</main><script src="ponteiro.js"></script><script src="engine.js"></script><script src="joaninhas.js"></script></body></html>

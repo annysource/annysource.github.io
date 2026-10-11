@@ -1,0 +1,6 @@
+---
+layout: null
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{% for item in site.pages %}{% if item.layout %}{% unless item.url contains '.xml' %}<url><loc>{{ item.url | absolute_url }}</loc></url>{% endunless %}{% endif %}{% endfor %}{% for item in site.projects %}<url><loc>{{ item.url | absolute_url }}</loc></url>{% endfor %}{% for item in site.posts %}<url><loc>{{ item.url | absolute_url }}</loc></url>{% endfor %}</urlset>
+

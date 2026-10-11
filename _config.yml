@@ -1,0 +1,27 @@
+title: Anny Caroline Sousa
+description: Creative Technologist e QA. Games, XR, IA e pesquisa aplicada.
+author: Anny Caroline Sousa
+url: "https://annysource.github.io"
+baseurl: ""
+lang: pt-BR
+markdown: kramdown
+permalink: /caderno/:title/
+linkedin_url: https://www.linkedin.com/in/annysousa/
+newsletter_url: ""
+portrait: ""
+email: ""
+cv_url: ""
+collections:
+  projects:
+    output: true
+    permalink: /projetos/:name/
+defaults:
+  - scope:
+      path: ""
+      type: projects
+    values:
+      layout: project
+exclude: [README.md, Gemfile, Gemfile.lock, vendor]
+
+
+

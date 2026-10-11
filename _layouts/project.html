@@ -1,0 +1,5 @@
+---
+layout: default
+---
+<div class="library-layout"><aside class="sidebar"><a href="{{ '/projetos/' | relative_url }}">← Projetos</a><dl><dt>Minha atuação</dt><dd>{{ page.role }}</dd>{% if page.organization %}<dt>Contexto</dt><dd>{{ page.organization }}</dd>{% endif %}{% if page.period %}<dt>Período</dt><dd>{{ page.period }}</dd>{% endif %}{% if page.technologies %}<dt>Tecnologias</dt><dd>{{ page.technologies | join: ', ' }}</dd>{% endif %}</dl></aside><article class="reading"><p class="eyebrow">{{ page.area }}</p><h1>{{ page.title }}</h1><p class="intro">{{ page.summary }}</p>{% if page.cover %}<img class="case-cover" src="{{ page.cover | relative_url }}" alt="{{ page.cover_alt | default: page.title | escape }}">{% endif %}{{ content }}</article></div>
+
