@@ -35,3 +35,30 @@
   height: 66px;
   transform: translateY(0px);
 }
+
+/* Thumbnail: somente a imagem diretamente dentro do link */
+.project-card .cover-link > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Ícone usado quando o projeto ainda não tem capa */
+.project-card .cover-placeholder.icon-cover {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.project-card .cover-placeholder.icon-cover > img {
+  width: 96px;
+  height: 96px;
+  aspect-ratio: auto;
+  object-fit: contain;
+  border-radius: 0;
+}
