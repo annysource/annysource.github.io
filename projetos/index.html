@@ -6,4 +6,3 @@ title: Projetos
 <div class="filters" aria-label="Filtrar projetos" hidden><button data-filter="all" aria-pressed="true">Todos</button><button data-filter="qa" aria-pressed="false">QA & colaboração</button><button data-filter="autoria" aria-pressed="false">Jogos autorais</button><button data-filter="pesquisa" aria-pressed="false">Pesquisa</button></div>
 <p class="filter-status" aria-live="polite"></p>
 <div class="project-grid">{% assign projects = site.projects | sort: 'order' %}{% for project in projects %}{% include project-card.html project=project %}{% endfor %}</div>
-

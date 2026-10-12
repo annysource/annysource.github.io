@@ -10,6 +10,10 @@ category: qa
 featured: true
 order: 1
 summary: "QA em jogo VR: cobertura de gameplay, análise de retestagem, saúde das builds e práticas de qualidade no feature freeze."
+gallery:
+  - src: /assets/images/the-boys-01.jpeg
+    alt: "Equipe desenvolvedora The Boys Trigger Warning - VR Game"
+    caption: "Game Creative Developers - The Boys Trigger Warning VR Game"
 ---
 
 ## Sobre o projeto
@@ -55,3 +59,4 @@ Elaborei material interno sobre bugs, ajustes e melhorias, com orientações par
 ## Confidencialidade
 
 Este relato preserva a confidencialidade dos materiais, métricas e detalhes proprietários do projeto.
+{% include gallery.html photos=page.gallery %}

@@ -1,4 +1,5 @@
 ---
+cover: /assets/images/sushi-ninja.png
 title: "Sushi Ninja — ativação Frescatto"
 role: "Game Producer & Creative Technologist"
 organization: "INÁ · Agência Traços · Frescatto"
