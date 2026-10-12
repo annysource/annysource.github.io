@@ -1,6 +1,7 @@
 ---
 cover: /assets/images/the-boys.jpg
 cover_alt: "Capa de The Boys: Trigger Warning"
+cover_position: center
 title: "The Boys: Trigger Warning"
 role: Quality Assurance
 organization: ARVORE Immersive Experience
@@ -71,4 +72,3 @@ O conteúdo conectava requisitos e comportamentos esperados à análise dos prob
 ## Confidencialidade
 
 Os materiais produzidos durante o projeto são confidenciais. Este relato apresenta minhas contribuições sem divulgar documentos internos, métricas, identificadores de issues ou detalhes proprietários.
-

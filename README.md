@@ -32,9 +32,11 @@ featured: false
 order: 4
 cover: /assets/images/nome.jpg
 cover_alt: Descrição da imagem
+cover_position: center
+cover_fit: cover
 ---
 ```
-Escreva abaixo contexto, contribuição, resultados e links. Categorias do filtro: qa, autoria, pesquisa. Remova cover até possuir imagem; o cartão mostra uma área neutra. Coloque fotos em `assets/images/`.
+Escreva abaixo contexto, contribuição, resultados e links. Categorias do filtro: qa, autoria, pesquisa. Remova cover até possuir imagem; o cartão mostra uma área neutra. Coloque fotos em `assets/images/`. Use `cover_position` para ajustar o enquadramento (por exemplo, `center top`) e `cover_fit: contain` para exibir a imagem inteira.
 
 ## Publicar no Caderno
 Crie `_posts/AAAA-MM-DD-titulo.md`, com:
