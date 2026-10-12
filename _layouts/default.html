@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="{{ page.lang | default: site.lang }}">
 <head>
+    <link rel="icon" type="image/png"
+      href="{{ '/assets/images/favicon.png' | relative_url }}">
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
 <title>{% if page.title %}{{ page.title | escape }} · {% endif %}{{ site.title | escape }}</title>
@@ -19,7 +21,20 @@
 <body>
 <a class="skip" href="#conteudo">Pular para conteúdo</a>
 <header class="header shell">
-<a class="brand" href="{{ '/' | relative_url }}">Anny Caroline<span>Creative Technologist | Quality Engineer</span></a>
+<a class="brand" href="{{ '/' | relative_url }}">
+  <span class="brand-top">
+    <img class="brand-icon"
+         src="{{ '/assets/images/joaninha.png' | relative_url }}"
+         alt=""
+         width="48"
+         height="48">
+    <span class="brand-name">Anny Caroline</span>
+  </span>
+
+  <span class="brand-subtitle">
+    | Creative Technologist · Quality Engineer |
+  </span>
+</a>
 <button class="menu-toggle" aria-expanded="false" aria-controls="navigation" hidden>Menu</button>
 <nav id="navigation" aria-label="Principal">
 {% for item in site.data.navigation %}<a href="{{ item.url | relative_url }}"{% if page.url contains item.url %} aria-current="page"{% endif %}>{{ item.title }}</a>{% endfor %}

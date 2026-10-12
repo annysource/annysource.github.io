@@ -2,6 +2,36 @@
 
 .photo-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin:32px 0}.photo-gallery figure{margin:0;min-width:0}.photo-gallery img{display:block;width:100%;height:auto;border-radius:6px}.photo-gallery figcaption{font-size:13px;color:var(--muted);line-height:1.5;margin-top:10px}.lightbox{max-width:960px;width:calc(100% - 32px);max-height:92dvh;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);padding:16px}.lightbox::backdrop{background:#27333199}.lightbox-toolbar{display:flex;gap:12px;align-items:center;margin-bottom:14px}.lightbox-toolbar button{padding:9px 12px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:5px;min-height:44px}.lightbox-toolbar [data-photo-close]{margin-left:auto}.lightbox figure{margin:0}.lightbox img{display:block;max-width:100%;max-height:70dvh;object-fit:contain;margin:auto}.lightbox figcaption{margin-top:12px;font-size:14px}.footer-pause{padding-top:0;padding-bottom:30px}.footer-pause details{max-width:720px;margin:auto}.footer-pause summary{font-size:14px;color:var(--muted);cursor:pointer;min-height:44px;padding:10px 0}.pause-intro{font-size:14px;margin:8px 0 16px}.footer-pause iframe{display:block;width:100%;border:0;border-radius:7px;background:#383b40;min-height:240px}.footer-pause summary:focus-visible{outline:3px solid #6487af;outline-offset:4px}@media(max-width:480px){.photo-gallery{gap:14px}.photo-gallery figcaption{font-size:12px}.lightbox{padding:12px}.lightbox-toolbar{gap:6px}}
 .footer{display:block}.footer-links{display:flex;gap:24px;align-items:center;flex-wrap:wrap}.footer .footer-pause{padding:18px 0 0;width:100%}@media(max-width:760px){.footer-links{gap:16px}}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
-/* Pictogramas originais: grafite e detalhes pastel. */
-.section-icon{display:block;flex:none;width:64px;height:64px;object-fit:contain;margin-bottom:12px}.icon-heading{display:flex;align-items:center;gap:14px}.icon-heading .section-icon{margin:0;width:56px;height:56px}.paths .section-icon{width:72px;height:72px;margin-bottom:18px}.cover-placeholder.icon-cover{flex-direction:column;gap:12px;background:#f3f2ec}.icon-cover img{width:96px;height:96px;object-fit:contain}.project-card[data-category="qa"] .icon-cover{background:#edf1f5}.project-card[data-category="autoria"] .icon-cover{background:#f0ebf5}.project-card[data-category="pesquisa"] .icon-cover{background:#eef2ee}@media(max-width:760px){.icon-heading{gap:10px}.icon-heading .section-icon{width:44px;height:44px}.paths .section-icon{width:64px;height:64px}}
+.brand .brand-top {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.brand .brand-top,
+.brand .brand-name {
+  font: inherit;
+  color: inherit;
+  letter-spacing: normal;
+}
+
+.brand .brand-subtitle {
+  display: block;
+  margin-left: 0;
+  font-size: 11px;
+  color: var(--muted);
+  white-space: normal;
+  transform: translateY(4px);
+}
+
+.brand-icon {
+  width: 66px;
+  height: 66px;
+  transform: translateY(5px);
+}

@@ -1,7 +1,7 @@
 ---
 layout: library
 title: Sobre mim
-kicker: Anny Caroline Sousa
+kicker: Anny Caroline
 ---
 Sou Creative Technologist e Creative Coder, com foco em garantia de qualidade. Minha formação é em Tecnologia em Jogos Digitais.
 
