@@ -44,6 +44,7 @@
 }
 
 .project-card .cover-link {
+  display: grid;
   aspect-ratio: 16 / 10;
   overflow: hidden;
   border-radius: 8px;
@@ -53,7 +54,8 @@
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: var(--cover-fit, cover);
+  object-position: var(--cover-position, center);
 }
 
 .project-card .cover-link > .cover-placeholder {

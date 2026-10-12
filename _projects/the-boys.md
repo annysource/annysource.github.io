@@ -1,7 +1,7 @@
 ---
 cover: /assets/images/the-boys.jpg
 cover_alt: "Capa de The Boys: Trigger Warning"
-cover_position: center
+cover_position: center 60%
 title: "The Boys: Trigger Warning"
 role: Quality Assurance
 organization: ARVORE Immersive Experience
