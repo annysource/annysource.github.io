@@ -1,5 +1,5 @@
 title: Anny Caroline Sousa
-description: Creative Technologist e QA. Games, XR, IA e pesquisa aplicada.
+description: "Anny Sousa — Creative Technologist com foco em Quality Engineering. Games, XR, experiências interativas e pesquisa aplicada."
 author: Anny Caroline Sousa
 url: "https://annysource.github.io"
 baseurl: ""
@@ -22,6 +22,5 @@ defaults:
     values:
       layout: project
 exclude: [README.md, Gemfile, Gemfile.lock, vendor]
-
 
 

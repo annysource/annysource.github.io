@@ -5,7 +5,7 @@ cover_position: center 60%
 title: "The Boys: Trigger Warning"
 role: Quality Assurance
 organization: ARVORE Immersive Experience
-area: Game Virtual Reality
+area: "Games & XR"
 category: qa
 featured: true
 order: 1

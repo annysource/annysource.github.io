@@ -1,7 +1,7 @@
 ---
 cover: /assets/images/sushi-ninja.png
 title: "Sushi Ninja — ativação Frescatto"
-role: "Game Producer & Creative Technologist"
+role: "Game Producer & Quality Assurance"
 organization: "INÁ · Agência Traços · Frescatto"
 area: "Games & Ativação de Marca"
 category: autoria
@@ -26,6 +26,8 @@ gallery:
 ---
 
 ## Sobre o projeto
+
+**Trabalho encomendado pela Agência Traços para a ativação da Frescatto.**
 
 Sushi Ninja foi desenvolvido para a ativação da Frescatto no Festival Taste São Paulo, a convite da Agência Traços. Em uma tela vertical touch, o público cortava ingredientes, somava pontos e disputava posições no ranking.
 

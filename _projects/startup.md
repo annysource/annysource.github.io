@@ -3,7 +3,7 @@ title: Jogos e empreendedorismo
 role: Criação & empreendedorismo
 area: Jogos autorais
 category: autoria
-featured: true
+featured: false
 order: 3
 summary: Trajetória em startups de jogos, entre projetos apoiados por fomento e jogos casuais para marcas.
 ---
@@ -15,4 +15,3 @@ Minha trajetória inclui uma startup com um jogo apoiado pela FAPERJ e pelo BNDE
 ## Projetos desenvolvidos
 
 [Sushi Ninja — ativação Frescatto]({{ '/projetos/sushi-ninja/' | relative_url }})
-
