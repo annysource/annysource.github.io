@@ -9,11 +9,11 @@ Conversas sobre tecnologia, games e minha atuação profissional.
 
 <!-- Adicionar título, veículo, data, papel e link público de cada entrevista ou podcast. -->
 
-<h2 id="palestras">Palestras</h2>
+<section id="palestras">
+<h2>Palestras</h2>
+<p><a href="{{ '/palestras/' | relative_url }}">Palestras →</a></p>
+</section>
 
-Participações em palestras.
-
-<!-- Adicionar título, evento, data, papel e link público de cada participação. -->
 
 <h2 id="juris">Júris</h2>
 
