@@ -1,16 +1,20 @@
 ---
 cover: /assets/images/sushi-ninja.png
-title: "Sushi Ninja — ativação Frescatto"
+title: "Sushi Ninja: ativação Frescatto"
 role: "Game Producer & Quality Assurance"
 organization: "INÁ · Agência Traços · Frescatto"
 area: "Games & Ativação de Marca"
 category: autoria
 featured: true
 order: 4
-summary: "Jogo desenvolvido sob encomenda da Agência Traços para a ativação da Frescatto no Taste São Paulo, onde tive de alinhar e conectar objetivos da marca, decisões criativas e experiência tecnológica."
-youtube_id: "TKIr4KqBR20"
+summary: "Jogo desenvolvido sob encomenda para a ativação da Frescatto no Taste São Paulo e Rio Gastronomia, conectando os objetivos da marca a uma experiência interativa em tela touch."
+youtube_id: "jTfiujMsidk"
+instagram_id: "Ddw3080hG65"
 video_cover: /assets/images/sushi-ninja-video.png
 gallery:
+  - src: /assets/images/sushi-ninja-exposicao-00.png
+    alt: "Influencer visitante joga Sushi Ninja"
+    caption: "@RJGourmet joga sushi ninja, impacto e engajamento garantido"
   - src: /assets/images/sushi-ninja-exposicao-01.png
     alt: "Criança fantasiada interage com o jogo Sushi Ninja enquanto adultos acompanham"
     caption: "Visitantes experimentam Sushi Ninja durante a ativação da Frescatto."
@@ -46,5 +50,6 @@ Documentei requisitos e comportamentos esperados, testei o jogo e alinhei dúvid
 ## Resultado
 
 O jogo foi utilizado na ativação e recebeu visitantes de diferentes idades. Vídeos e fotografias registram a experiência em uso.
+
 
 {% include gallery.html photos=page.gallery %}

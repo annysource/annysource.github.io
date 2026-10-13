@@ -9,7 +9,7 @@ area: "Games & XR"
 category: qa
 featured: true
 order: 1
-summary: "QA em jogo VR: cobertura de gameplay, análise de retestagem, saúde das builds e práticas de qualidade no feature freeze."
+summary: "Jogo de ação em realidade virtual ambientado no universo de The Boys, disponível para PlayStation VR2 e Meta Quest."
 gallery:
   - src: /assets/images/the-boys-01.jpeg
     alt: "Equipe desenvolvedora The Boys Trigger Warning - VR Game"
@@ -22,7 +22,7 @@ The Boys: Trigger Warning é um jogo de ação em realidade virtual ambientado n
 
 ## Minha atuação
 
-Durante um ano, integrei uma equipe com uma Lead QA e outros dois colegas. Testei gameplay, acompanhei defeitos e comuniquei riscos a desenvolvimento, game design e produção.
+Durante um ano, integrei uma equipe com uma Lead QA e outros quatro colegas. Testei gameplay, acompanhei defeitos e comuniquei riscos a desenvolvimento, game design e produção.
 
 Meu foco foi apoiar a priorização de correções, identificar fontes de retrabalho e ampliar a cobertura dos testes.
 
@@ -34,7 +34,7 @@ Em colaboração com game designers, criei uma tabela de gameplay sections que r
 
 ## Saúde das builds e experiência dos jogadores
 
-Colaborei com relatórios de saúde das builds e criei one-pagers com issues críticas para diretores e produtores. Organizei essas informações no Jira e no Confluence.
+Colaborei com relatórios de saúde das builds com issues críticas para diretores e produtores. Organizei essas informações, em dashboard e relatório onepager por ciclo de desenvolvimento, no Jira e no Confluence.
 
 Analisei vídeos de gameplay de usuários e registrei dificuldades de interação e oportunidades de UX no backlog. Também participei de testes para PlayStation Store e Meta Store, incluindo verificações de VRC da Meta.
 
@@ -51,6 +51,7 @@ Elaborei material interno sobre bugs, ajustes e melhorias, com orientações par
 > — **Ricardo Laganaro**, Chief Creative Officer da ARVORE
 
 [Ver comentário original no LinkedIn](https://lnkd.in/p/dNZuigbF)
+
 
 ## Links
 

@@ -155,3 +155,4 @@
   display: inline-block;
   margin-top: 8px;
 }
+.initiatives-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:36px}.initiative{min-width:0;border-top:2px solid var(--line);padding-top:18px}.initiative h3{margin-top:0}.initiative p{font-size:15px}.initiative-links{margin-top:22px}@media(max-width:760px){.initiatives-grid{grid-template-columns:1fr;gap:28px}}

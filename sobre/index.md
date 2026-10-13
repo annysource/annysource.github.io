@@ -14,7 +14,7 @@ Minha formação é em Tecnologia em Jogos Digitais. Trabalho com desenvolviment
 
 ## Empreendedorismo e produção — Iná Game Studio
 
-Sou fundadora da Iná Game Studio. Minha atuação reúne produção de jogos e experiências interativas e alinhamento com clientes.
+Sou fundadora da Iná Game Studio. Na criação e produção de jogos e experiências interativas, conecto objetivos de clientes, decisões criativas, equipe e qualidade da entrega.
 
 ## Formação e processos — QA Game HUB
 
