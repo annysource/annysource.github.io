@@ -5,7 +5,7 @@ organization: Escola de Guerra Naval
 area: Pesquisa aplicada
 category: pesquisa
 featured: true
-order: 2
+order: 5
 summary: Experiência de pesquisa na interface entre conhecimento, tecnologia e contexto institucional.
 ---
 ## Pesquisa e contribuição

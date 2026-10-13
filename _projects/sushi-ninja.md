@@ -6,7 +6,7 @@ organization: "INÁ · Agência Traços · Frescatto"
 area: "Games & Ativação de Marca"
 category: autoria
 featured: true
-order: 4
+order: 3
 summary: "Jogo desenvolvido sob encomenda para a ativação da Frescatto no Taste São Paulo e Rio Gastronomia, conectando os objetivos da marca a uma experiência interativa em tela touch."
 youtube_id: "jTfiujMsidk"
 instagram_id: "Ddw3080hG65"

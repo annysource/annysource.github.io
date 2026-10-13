@@ -9,7 +9,7 @@ organization: "INÁ · Agência Traços · Frescatto"
 area: "Games & Ativação de Marca"
 category: autoria
 featured: true
-order: 5
+order: 2
 summary: "Jogo desenvolvido sob encomenda para a Frescatto, conectando criação, tecnologia e sustentabilidade em uma pescaria interativa sobre o período de defeso."
 gallery:
   - src: /assets/images/defeso-game.png
