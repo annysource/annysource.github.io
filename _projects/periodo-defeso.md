@@ -12,9 +12,25 @@ featured: true
 order: 2
 summary: "Jogo desenvolvido sob encomenda para a Frescatto, conectando criação, tecnologia e sustentabilidade em uma pescaria interativa sobre o período de defeso."
 gallery:
-  - src: /assets/images/defeso-game.png
-    alt: "Influencer visitante joga Defeso Game"
-    caption: "@RJGourmet joga sushi ninja, impacto e engajamento garantido"
+  - src: /assets/images/defeso-game-01.png
+    alt: "Stand da Frescatto a noite Rio Gastronomia"
+    caption: "Stand da Frescatto a noite Rio Gastronomia"
+  - src: /assets/images/defeso-game-02.png
+    alt: "" 
+    caption: ""
+  - src: /assets/images/defeso-game-03.png
+    alt: "" 
+    caption: ""
+  - src: /assets/images/defeso-game-04.png
+    alt: "" 
+    caption: ""
+  - src: /assets/images/defeso-game-05.png
+    alt: "" 
+    caption: ""
+  - src: /assets/images/defeso-game-06.png
+    alt: "" 
+    caption: ""
+    
 ---
 
 ## Sobre o projeto
