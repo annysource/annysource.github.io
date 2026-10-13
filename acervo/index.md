@@ -11,7 +11,7 @@ Conversas sobre tecnologia, games e minha atuação profissional.
 
 <section id="palestras">
 <h2>Palestras</h2>
-<p><a href="{{ '/palestras/' | relative_url }}">Palestras →</a></p>
+<p><a href="{{ '/palestras/' | relative_url }}">Registros de palestras e conversas públicas sobre carreira →</a></p>
 </section>
 
 
