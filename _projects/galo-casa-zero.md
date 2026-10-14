@@ -1,26 +1,26 @@
 ---
-title: "Galo na Casa Zero — cultura e IA generativa"
+title: "Galo na Casa Zero: cultura e IA generativa"
 role: "XR Technologist · Quality Assurance"
 organization: "Accenture Brasil"
 area: "IA Generativa & Experiências Interativas"
 category: qa
 featured: true
-order: 6
+order: 2
 cover: /assets/images/galo-casa-zero.jpg
 summary: "Colaboração com arte 3D, UX, web design e backend em uma experiência educativa com IA generativa, incluindo validação de prompts e retornos de API."
 gallery:
   - src: /assets/images/galo-casa-zero-04.jpg
-    alt: ""
-    caption: ""
+    alt: "Casa Zero no Coração de Recife"
+    caption: "Casa Zero no Coração de Recife"
   - src: /assets/images/galo-casa-zero-03.jpg
     alt: ""
-    caption: ""
+    caption: "TV mostra início da experiência, você responde perguntas pessoais enquanto um ovo é chocado"
   - src: /assets/images/galo-casa-zero.jpg
     alt: ""
-    caption: ""
+    caption: "Galo da Madrugada Generativo - chocado de acordo com as preferências individuais dos usuários "
   - src: /assets/images/galo-casa-zero-01.png
     alt: ""
-    caption: ""
+    caption: "Parte da equipe desenvolvedora baseada no Porto Digital"
 ---
 
 ## Sobre o projeto
