@@ -68,3 +68,13 @@ Use o rascunho _drafts/encontro.md como modelo. Coloque fotos reais em assets/im
 
 ## Joaninhas no rodapé
 Os arquivos de jogo foram copiados para assets/joaninhas. A integração está em _includes/footer-game.html e assets/footer-game.js. O jogo fica numa seção opcional recolhida, inicia em cinza chumbo e só roda quando a pessoa começa a jogar. O iframe ajusta sua altura aos controles. O ponteiro.js também é carregado pela página hospedeira. As URLs usam relative_url, incluindo em repositórios com baseurl.
+
+## Bora marcar?
+A interface publicada fica em `bora-marcar/`. O Worker e os testes ficam em `worker/` e `tests/`; `wrangler.jsonc` e os arquivos npm ficam na raiz. O Jekyll exclui esses arquivos de `_site`.
+
+- `npm test`: executa os testes do app e do Worker.
+- `npm run preview`: serve a interface localmente em `http://127.0.0.1:4173`.
+- `bora-marcar/config.js`: contém somente a URL pública da API. Para uma demonstração local sem sincronização, deixe `apiUrl` vazio; restaure a URL do Worker antes de publicar.
+- Para publicar a API pela primeira vez, instale as dependências com `npm install`, autentique com `npx wrangler login`, execute `npm run api:deploy` e depois configure `CREATE_KEY` com `npx wrangler secret put CREATE_KEY`. Não coloque essa chave em `config.js`.
+
+A API permite criação apenas com `CREATE_KEY`, protege alterações de votos com PIN e restringe a origem em `wrangler.jsonc`. CORS não substitui autorização. O PIN protege edições depois do primeiro voto, mas não confirma a identidade na primeira resposta. Teste em dois dispositivos antes de usar com um grupo; `npm test` não valida uma implantação real do Cloudflare.

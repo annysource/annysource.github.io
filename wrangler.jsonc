@@ -1,0 +1,10 @@
+{
+  "name": "bora-marcar-api",
+  "main": "worker/worker.js",
+  "compatibility_date": "2026-10-14",
+  "durable_objects": { "bindings": [{"name":"MEETINGS","class_name":"MeetingRoom"}] },
+  "migrations": [{"tag":"v1","new_sqlite_classes":["MeetingRoom"]}],
+  "vars": {
+    "ALLOWED_ORIGIN": "https://annysousa.dev"
+  }
+}

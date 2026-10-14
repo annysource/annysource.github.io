@@ -1,0 +1,1 @@
+{"name":"bora-marcar","private":true,"type":"module","scripts":{"test":"node --test tests/*.test.js","preview":"node preview.js","api:dev":"wrangler dev","api:deploy":"wrangler deploy"},"devDependencies":{"wrangler":"^4.0.0"}}

@@ -8,6 +8,8 @@ featured: true
 order: 2
 cover: /assets/images/galo-casa-zero.jpg
 summary: "Colaboração com arte 3D, UX, web design e backend em uma experiência educativa com IA generativa, incluindo validação de prompts e retornos de API."
+youtube_id: HhuxziWQs-s
+video_cover: /assets/images/galo-casa-zero.jpg
 gallery:
   - src: /assets/images/galo-casa-zero-04.jpg
     alt: "Casa Zero no Coração de Recife"

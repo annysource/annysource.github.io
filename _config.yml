@@ -21,6 +21,5 @@ defaults:
       type: projects
     values:
       layout: project
-exclude: [README.md, Gemfile, Gemfile.lock, vendor]
-
+exclude: [README.md, Gemfile, Gemfile.lock, vendor, worker, tests, package.json, package-lock.json, preview.js, wrangler.jsonc, node_modules, .dev.vars, .wrangler]
 
