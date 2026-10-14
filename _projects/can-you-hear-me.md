@@ -1,12 +1,12 @@
 ---
 cover: /assets/images/can-you-hear-me.png
-title: "Can You Hear Me? — Voice of the Oceans"
-role: "XR Tech Analyst · Desenvolvimento & Quality Assurance"
+title: "Can You Hear Me? Voice of the Oceans"
+role: "XR Technologist · Quality Assurance"
 organization: "Accenture · Voice of the Oceans"
 area: "XR & Educação Ambiental"
 category: qa
 featured: true
-order: 7
+order: 2
 summary: "Desenvolvimento e qualidade de uma experiência VR sobre poluição dos oceanos, com atuação em performance, localização, tutorial e requisitos da Meta Store. "
 gallery:
   - src: /assets/images/can-you-hear-me-01.WEBP

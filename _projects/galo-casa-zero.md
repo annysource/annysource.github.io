@@ -5,7 +5,7 @@ organization: "Accenture Brasil"
 area: "IA Generativa & Experiências Interativas"
 category: qa
 featured: true
-order: 2
+order: 3
 cover: /assets/images/galo-casa-zero.jpg
 summary: "Colaboração com arte 3D, UX, web design e backend em uma experiência educativa com IA generativa, incluindo validação de prompts e retornos de API."
 youtube_id: HhuxziWQs-s
