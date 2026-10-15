@@ -6,6 +6,7 @@ title: "The Boys: Trigger Warning"
 role: Quality Assurance
 organization: ARVORE Immersive Experience
 area: "Games & XR"
+technologies: [Unity, "C#", k6, LLMs, "Prompt Tester", "OVR Metrics"]
 category: qa
 featured: true
 order: 1
