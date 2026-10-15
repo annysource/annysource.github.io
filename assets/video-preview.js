@@ -17,7 +17,7 @@
 
     const iframe = document.createElement('iframe');
     iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}?autoplay=1&mute=${muted ? 1 : 0}&loop=1&playlist=${encodeURIComponent(videoId)}&controls=1&playsinline=1&rel=0`;
-    iframe.title = 'Vídeo Sushi Ninja no YouTube';
+    iframe.title = preview.dataset.videoTitle || 'Vídeo do projeto no YouTube';
     iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
     iframe.allowFullscreen = true;
     iframe.loading = 'eager';
