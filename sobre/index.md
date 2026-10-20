@@ -12,9 +12,9 @@ Atuo com QA, investigação de defeitos, processos de qualidade e análise da sa
 
 Minha formação é em Tecnologia em Jogos Digitais. Trabalho com desenvolvimento e validação de games, XR e experiências interativas.
 
-## Empreendedorismo e produção — Iná Game Studio
+## Empreendedorismo e produção — Inaluz Cria
 
-Sou fundadora da Iná Game Studio. Na criação e produção de jogos e experiências interativas, conecto objetivos de clientes, decisões criativas, equipe e qualidade da entrega.
+Sou fundadora da Inaluz Cria. Na criação e produção de jogos e experiências interativas, conecto objetivos de clientes, decisões criativas, equipe e qualidade da entrega.
 
 ## Formação e processos — QA Game HUB
 
