@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta name="robots" content="noindex, nofollow" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fila Justa · Festival Horizonte 2026</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+/* ======================================================================
+   CONFIGURAÇÃO DO EVENTO
+   ====================================================================== */
+const EVENT = { name: 'Festival Horizonte 2026', date: '12 dez 2026 · 18h', venue: 'Arena Central' };
+const DEFAULT_TITLE = `Fila Justa · ${EVENT.name}`;
+
+const MAX_PER_PERSON = 4;      // limite por pessoa (CPF)
+const MAX_PER_METHOD = 4;      // limite por meio de pagamento
+const BUY_SECONDS = 180;       // tempo para comprar
+const RENEW_SECONDS = 120;     // tempo extra (uma única renovação)
+const ENTRANCE_SECONDS = 20;   // demo: tempo até a abertura da venda
+const DEMO_CODE = '123456';    // demo: código de verificação da conta
+
+const GROUPS = [
+  { id: 'fan',  label: 'Sócio do fã-clube' },
+  { id: 'pcd',  label: 'Pessoa com deficiência (PCD)' },
+  { id: 'half', label: 'Meia-entrada (estudante, idoso, ID Jovem)' },
+];
+
+// Pools anunciados com antecedência: cada um tem fila própria e visível.
+const POOLS = {
+  fan:     { id: 'fan',     name: 'Pré-venda Fã-clube',     when: '16 out · 10h',  size: 320,  requires: 'fan',  desc: 'Exclusiva para sócios, com fila própria.' },
+  pcd:     { id: 'pcd',     name: 'Pool PCD + acompanhante', when: '16 out · 10h',  size: 40,   requires: 'pcd',  desc: 'Cota reservada, fora da fila geral.' },
+  half:    { id: 'half',    name: 'Pool Meia-entrada',      when: '17 out · 12h',  size: 600,  requires: 'half', desc: 'Cota de 40% dos ingressos de pista.' },
+  general: { id: 'general', name: 'Venda geral',            when: 'Hoje · 18h30',  size: 2400, requires: null,   desc: 'Aberta a todas as contas verificadas.' },
+};
+Object.values(POOLS).forEach(p => { p.rate = Math.ceil(p.size / 50); }); // pessoas/s em velocidade 1x
+
+const TICKETS = [
+  { id: 'pista',    name: 'Pista',                       price: 180, pool: 'general', stock: 1200 },
+  { id: 'premium',  name: 'Pista Premium',               price: 320, pool: 'general', stock: 400 },
+  { id: 'camarote', name: 'Camarote',                    price: 540, pool: 'general', stock: 80 },
+  { id: 'fan',      name: 'Pista · Fã-clube',            price: 150, pool: 'fan',     stock: 150 },
+  { id: 'pcd',      name: 'Pista · PCD (+ acompanhante)', price: 90,  pool: 'pcd',     stock: 30 },
+  { id: 'half',     name: 'Pista · Meia-entrada',        price: 90,  pool: 'half',    stock: 300 },
+];
+
+// Estoque restante (inclui compras já feitas nesta demo).
+const readStock = () => ({ ...Object.fromEntries(TICKETS.map((t) => [t.id, t.stock])), ...store.get('fila.stock', {}) });
+
+/* ======================================================================
+   UTILIDADES
+   ====================================================================== */
+const brl = (n) => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const mmss = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+const fmtEta = (s) => (s < 45 ? 'menos de 1 min' : `${Math.max(1, Math.floor(s * 0.8 / 60))}–${Math.ceil(s * 1.25 / 60)} min`);
+
+const maskCPF = (v) => {
+  const d = v.replace(/\D/g, '').slice(0, 11);
+  return d.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+};
+
+const validCPF = (v) => {
+  const d = v.replace(/\D/g, '');
+  if (d.length !== 11 || /^(\d)\1+$/.test(d)) return false;
+  const digit = (len) => {
+    let sum = 0;
+    for (let i = 0; i < len; i++) sum += Number(d[i]) * (len + 1 - i);
+    const r = (sum * 10) % 11;
+    return r === 10 ? 0 : r;
+  };
+  return digit(9) === Number(d[9]) && digit(10) === Number(d[10]);
+};
+
+const store = {
+  get: (k, fallback = null) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fallback; } catch { return fallback; } },
+  set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  del: (k) => { try { localStorage.removeItem(k); } catch {} },
+};
+
+/* "Uma pessoa, uma posição": uma conta só ocupa um lugar por vez (entre abas). */
+const TAB_ID = Math.random().toString(36).slice(2);
+const seats = {
+  claim(cpf) {
+    const all = store.get('fila.active', {});
+    const cur = all[cpf];
+    if (cur && cur.tab !== TAB_ID && Date.now() - cur.ts < 6000) return false;
+    all[cpf] = { tab: TAB_ID, ts: Date.now() };
+    store.set('fila.active', all);
+    return true;
+  },
+  release(cpf) {
+    const all = store.get('fila.active', {});
+    if (all[cpf]?.tab === TAB_ID) { delete all[cpf]; store.set('fila.active', all); }
+  },
+};
+
+/* ======================================================================
+   HOOKS
+   ====================================================================== */
+function useDocumentTitle(title) {
+  useEffect(() => {
+    document.title = title;
+    return () => { document.title = DEFAULT_TITLE; };
+  }, [title]);
+}
+
+/* Som + notificação do navegador quando chega a vez. */
+function useAlerts() {
+  const ctxRef = useRef(null);
+  const soundRef = useRef(true);
+  const [soundOn, setSoundOn] = useState(true);
+  useEffect(() => { soundRef.current = soundOn; }, [soundOn]);
+
+  // Precisa ser chamado dentro de um clique (política de autoplay dos navegadores).
+  const unlock = useCallback(() => {
+    try {
+      if (!ctxRef.current) ctxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+      ctxRef.current.resume();
+    } catch {}
+    if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+  }, []);
+
+  const alertTurn = useCallback(() => {
+    const ctx = ctxRef.current;
+    if (ctx && soundRef.current) {
+      [659.25, 783.99, 1046.5, 1318.5].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const t = ctx.currentTime + i * 0.18;
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.0001, t);
+        gain.gain.exponentialRampToValueAtTime(0.25, t + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.5);
+      });
+    }
+    if ('Notification' in window && Notification.permission === 'granted' && document.hidden) {
+      const n = new Notification('Sua vez!', { body: `Você tem ${BUY_SECONDS / 60} minutos para concluir a compra.` });
+      n.onclick = () => { window.focus(); n.close(); };
+    }
+    window.focus();
+  }, []);
+
+  return { soundOn, setSoundOn, unlock, alertTurn };
+}
+
+/* ======================================================================
+   COMPONENTES BASE
+   ====================================================================== */
+const inputCls = 'w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100';
+const btnPrimary = 'inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-300';
+const btnGhost = 'inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50';
+
+const Card = ({ className = '', children }) => (
+  <section className={`rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 ${className}`}>{children}</section>
+);
+
+const Chip = ({ tone = 'slate', children }) => {
+  const tones = {
+    slate: 'bg-slate-100 text-slate-600',
+    green: 'bg-emerald-50 text-emerald-700',
+    amber: 'bg-amber-50 text-amber-700',
+    indigo: 'bg-indigo-50 text-indigo-700',
+  };
+  return <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${tones[tone]}`}>{children}</span>;
+};
+
+const Field = ({ label, hint, children }) => (
+  <label className="block">
+    <span className="mb-1.5 flex justify-between text-sm font-medium text-slate-700">{label}{hint && <span className="font-normal text-slate-400">{hint}</span>}</span>
+    {children}
+  </label>
+);
+
+const Alert = ({ tone = 'red', children }) => {
+  const tones = { red: 'bg-red-50 text-red-700 ring-red-200', amber: 'bg-amber-50 text-amber-800 ring-amber-200' };
+  return <p role="alert" className={`rounded-xl px-4 py-3 text-sm ring-1 ${tones[tone]}`}>{children}</p>;
+};
+
+const Progress = ({ value, tone = 'indigo' }) => (
+  <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+    <div className={`h-full rounded-full transition-all duration-500 ${tone === 'red' ? 'bg-red-500' : 'bg-indigo-600'}`} style={{ width: `${Math.min(100, Math.max(0, value))}%` }} />
+  </div>
+);
+
+const STEPS = ['Ingressos', 'Entrada', 'Fila', 'Pagamento', 'Concluído'];
+const STAGE_IDX = { select: 0, entrance: 1, queue: 2, checkout: 3, expired: 3, done: 4 };
+
+function Stepper({ stage }) {
+  const current = STAGE_IDX[stage];
+  return (
+    <ol className="mb-8 flex items-center gap-2 overflow-x-auto text-xs sm:text-sm">
+      {STEPS.map((label, i) => (
+        <li key={label} className="flex items-center gap-2">
+          <span className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${i < current ? 'bg-emerald-500 text-white' : i === current ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-500'}`}>
+            {i < current ? '✓' : i + 1}
+          </span>
+          <span className={`whitespace-nowrap ${i === current ? 'font-semibold text-slate-900' : 'text-slate-500'}`}>{label}</span>
+          {i < STEPS.length - 1 && <span className="mx-1 h-px w-6 bg-slate-300 sm:w-10" />}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+/* ======================================================================
+   1. LOGIN (primeira tela — sem conta verificada não há fila)
+   ====================================================================== */
+function Login({ onLogin }) {
+  const [f, setF] = useState({ name: '', cpf: '', code: '', groups: [] });
+  const [err, setErr] = useState('');
+  const set = (k, v) => setF((p) => ({ ...p, [k]: v }));
+  const toggle = (g) => setF((p) => ({ ...p, groups: p.groups.includes(g) ? p.groups.filter((x) => x !== g) : [...p.groups, g] }));
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (!validCPF(f.cpf)) return setErr('CPF inválido.');
+    if (f.code !== DEMO_CODE) return setErr('Código de verificação incorreto.');
+    onLogin({ name: f.name.trim() || 'Visitante', cpf: maskCPF(f.cpf), groups: f.groups });
+  };
+
+  return (
+    <div className="mx-auto grid min-h-screen max-w-5xl items-center gap-10 px-4 py-10 lg:grid-cols-2">
+      <div>
+        <Chip tone="indigo">🎟️ {EVENT.date} · {EVENT.venue}</Chip>
+        <h1 className="mt-4 text-4xl font-bold tracking-tight text-slate-900">{EVENT.name}</h1>
+        <p className="mt-3 text-lg text-slate-600">Uma fila transparente: você sabe onde está, quanto falta e o que acontece a seguir.</p>
+        <ul className="mt-6 space-y-3 text-sm text-slate-600">
+          {[
+            ['🔐', 'Conta verificada obrigatória: uma pessoa, uma posição.'],
+            ['🎲', 'Sala de entrada: quem chega antes da abertura recebe posição aleatória, sem corrida de cliques.'],
+            ['🔔', 'Deixe a aba aberta: avisamos com som, título e notificação quando for a sua vez.'],
+            ['🧭', 'Pools de fã-clube, PCD e meia-entrada têm fila própria, anunciada com antecedência.'],
+          ].map(([icon, text]) => (
+            <li key={text} className="flex gap-3"><span>{icon}</span><span>{text}</span></li>
+          ))}
+        </ul>
+      </div>
+
+      <Card className="p-7">
+        <h2 className="text-xl font-semibold text-slate-900">Entrar com sua conta</h2>
+        <div className="mt-3 rounded-xl bg-indigo-50 px-4 py-3 text-sm text-indigo-900">
+          <p className="font-medium">Protótipo: use estes dados para entrar</p>
+          <p className="mt-1">CPF: <strong className="font-mono">529.982.247-25</strong></p>
+          <p>Código de verificação: <strong className="font-mono">{DEMO_CODE}</strong></p>
+        </div>
+        <form onSubmit={submit} className="mt-6 space-y-4">
+          <Field label="Nome completo"><input className={inputCls} value={f.name} onChange={(e) => set('name', e.target.value)} autoComplete="name" /></Field>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="CPF"><input className={inputCls} value={f.cpf} onChange={(e) => set('cpf', maskCPF(e.target.value))} inputMode="numeric" placeholder="000.000.000-00" /></Field>
+            <Field label="Código de verificação"><input className={inputCls} value={f.code} onChange={(e) => set('code', e.target.value.replace(/\D/g, '').slice(0, 6))} inputMode="numeric" placeholder="6 dígitos" /></Field>
+          </div>
+
+          <fieldset className="rounded-xl bg-slate-50 p-4">
+            <legend className="px-1 text-sm font-medium text-slate-700">Grupos declarados no cadastro</legend>
+            <p className="mb-3 text-xs text-slate-500">Validados antes da venda, nunca no meio da fila.</p>
+            <div className="space-y-2">
+              {GROUPS.map((g) => (
+                <label key={g.id} className="flex items-center gap-2 text-sm">
+                  <input type="checkbox" className="h-4 w-4 rounded border-slate-300 text-indigo-600" checked={f.groups.includes(g.id)} onChange={() => toggle(g.id)} />
+                  {g.label}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          {err && <Alert>{err}</Alert>}
+          <button className={`${btnPrimary} w-full`}>Entrar</button>
+        </form>
+      </Card>
+    </div>
+  );
+}
+
+/* ======================================================================
+   2. ESCOLHA DE INGRESSOS (até 2 tipos) + POOLS VISÍVEIS
+   ====================================================================== */
+function PoolsPanel({ user }) {
+  return (
+    <Card>
+      <h3 className="font-semibold text-slate-900">Pools e pré-vendas</h3>
+      <p className="mt-1 text-xs text-slate-500">Todos anunciados com antecedência. Cada pool tem fila e cota próprias.</p>
+      <ul className="mt-4 space-y-3">
+        {Object.values(POOLS).map((p) => {
+          const ok = !p.requires || user.groups.includes(p.requires);
+          return (
+            <li key={p.id} className="rounded-xl border border-slate-200 p-3">
+              <div className="flex items-start justify-between gap-2">
+                <p className="text-sm font-medium text-slate-900">{p.name}</p>
+                {ok ? <Chip tone="green">Habilitado</Chip> : <Chip tone="amber">🔒 Requer cadastro</Chip>}
+              </div>
+              <p className="mt-1 text-xs text-slate-500">{p.desc}</p>
+              <p className="mt-2 text-xs text-slate-400">{p.when} · ≈ {p.size.toLocaleString('pt-BR')} pessoas na fila</p>
+            </li>
+          );
+        })}
+      </ul>
+    </Card>
+  );
+}
+
+function Select({ user, onJoin }) {
+  const [qty, setQty] = useState({});
+  const [notice, setNotice] = useState('');
+  const [stock] = useState(readStock);
+
+  const chosen = TICKETS.filter((t) => qty[t.id] > 0);
+  const total = chosen.reduce((s, t) => s + qty[t.id], 0);
+  const amount = chosen.reduce((s, t) => s + qty[t.id] * t.price, 0);
+  // Uma pessoa, uma posição: a fila é a do pool prioritário (ordem de POOLS); os demais tipos entram no mesmo atendimento.
+  const pools = Object.keys(POOLS).filter((id) => chosen.some((t) => t.pool === id));
+  const poolId = pools[0];
+
+  const eligible = (t) => !POOLS[t.pool].requires || user.groups.includes(POOLS[t.pool].requires);
+
+  const change = (t, delta) => {
+    const cur = qty[t.id] || 0;
+    setNotice('');
+    if (delta > 0) {
+      if (cur >= stock[t.id]) return setNotice(`Só restam ${stock[t.id]} ingressos de ${t.name}.`);
+      if (total >= MAX_PER_PERSON) return setNotice(`Limite de ${MAX_PER_PERSON} ingressos por pessoa.`);
+      if (!cur && chosen.length >= 2) return setNotice('Você pode escolher no máximo 2 tipos de ingresso.');
+    }
+    setQty((q) => ({ ...q, [t.id]: Math.max(0, cur + delta) }));
+  };
+
+  const join = () => {
+    const msg = onJoin({ items: chosen.map((t) => ({ ...t, qty: qty[t.id] })), pool: poolId, pools, total, amount });
+    if (msg) setNotice(msg);
+  };
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+      <div className="space-y-6">
+        <Card>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 className="text-xl font-semibold text-slate-900">Quais ingressos você quer?</h2>
+              <p className="text-sm text-slate-500">Até 2 tipos · máximo de {MAX_PER_PERSON} ingressos por pessoa.</p>
+            </div>
+            <Chip tone="indigo">{total}/{MAX_PER_PERSON} selecionados</Chip>
+          </div>
+
+          <ul className="mt-5 divide-y divide-slate-100">
+            {TICKETS.map((t) => {
+              const ok = eligible(t);
+              const n = qty[t.id] || 0;
+              return (
+                <li key={t.id} className={`flex items-center justify-between gap-4 py-4 ${ok ? '' : 'opacity-60'}`}>
+                  <div>
+                    <p className="font-medium text-slate-900">{t.name}</p>
+                    <p className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                      <Chip tone={stock[t.id] <= t.stock * 0.1 ? 'amber' : 'slate'}>
+                        {stock[t.id] <= t.stock * 0.1 ? '🔥 Últimas unidades · ' : ''}Restam {stock[t.id].toLocaleString('pt-BR')}
+                      </Chip>
+                      {POOLS[t.pool].name}
+                      {!ok && <span className="ml-2 text-amber-700">🔒 Declare “{GROUPS.find((g) => g.id === POOLS[t.pool].requires).label}” no cadastro</span>}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm font-semibold text-slate-700">{brl(t.price)}</span>
+                    <div className="flex items-center gap-2">
+                      <button className="h-8 w-8 rounded-lg border border-slate-300 text-lg leading-none hover:bg-slate-50 disabled:opacity-40" disabled={!ok || n === 0} onClick={() => change(t, -1)} aria-label={`Remover ${t.name}`}>−</button>
+                      <span className="w-5 text-center text-sm font-semibold">{n}</span>
+                      <button className="h-8 w-8 rounded-lg border border-slate-300 text-lg leading-none hover:bg-slate-50 disabled:opacity-40" disabled={!ok} onClick={() => change(t, 1)} aria-label={`Adicionar ${t.name}`}>+</button>
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+          {notice && <div className="mt-2"><Alert tone="amber">{notice}</Alert></div>}
+        </Card>
+
+        <Card className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-sm text-slate-500">Total</p>
+            <p className="text-2xl font-bold text-slate-900">{brl(amount)}</p>
+            {poolId && (
+              <p className="text-xs text-slate-500">
+                Fila: {POOLS[poolId].name}
+                {pools.length > 1 && ` · compra conjunta com ${pools.slice(1).map((id) => POOLS[id].name).join(', ')}`}
+              </p>
+            )}
+            {chosen.map((t) => (
+              <p key={t.id} className="text-xs text-slate-500">
+                {t.name}: restarão {(stock[t.id] - qty[t.id]).toLocaleString('pt-BR')} após sua escolha
+              </p>
+            ))}
+          </div>
+          <button className={btnPrimary} disabled={total === 0} onClick={join}>Entrar na sala de entrada →</button>
+        </Card>
+      </div>
+
+      <PoolsPanel user={user} />
+    </div>
+  );
+}
+
+/* ======================================================================
+   3. SALA DE ENTRADA — sem posição; sorteio aleatório na abertura
+   ====================================================================== */
+function Entrance({ order, speed, onDrawn, onLeave }) {
+  const pool = POOLS[order.pool];
+  const [opensAt] = useState(() => Date.now() + (ENTRANCE_SECONDS * 1000) / speed);
+  const [left, setLeft] = useState(ENTRANCE_SECONDS / speed);
+  const [crowd, setCrowd] = useState(840);
+  const [phase, setPhase] = useState('waiting');
+  const [shown, setShown] = useState(null);
+
+  useDocumentTitle(phase === 'waiting' ? `Entrada · abre em ${mmss(Math.ceil(left))}` : 'Sorteando posição…');
+
+  useEffect(() => {
+    if (phase !== 'waiting') return;
+    const id = setInterval(() => {
+      const l = Math.max(0, (opensAt - Date.now()) / 1000);
+      setLeft(l);
+      setCrowd((c) => c + Math.floor(Math.random() * 30));
+      if (l <= 0) setPhase('drawing');
+    }, 500);
+    return () => clearInterval(id);
+  }, [phase, opensAt]);
+
+  useEffect(() => {
+    if (phase !== 'drawing') return;
+    const total = pool.size + crowd;
+    const final = 1 + Math.floor(Math.random() * total);
+    const spin = setInterval(() => setShown(1 + Math.floor(Math.random() * total)), 70);
+    const end = setTimeout(() => {
+      clearInterval(spin);
+      setShown(final);
+      setTimeout(() => onDrawn(final, total), 900);
+    }, 2200);
+    return () => { clearInterval(spin); clearTimeout(end); };
+  }, [phase]);
+
+  return (
+    <div className="mx-auto max-w-2xl space-y-6">
+      <Card className="p-8 text-center">
+        <Chip tone="indigo">Sala de entrada · {pool.name}</Chip>
+        {phase === 'waiting' ? (
+          <>
+            <p className="mt-6 text-sm text-slate-500">A venda abre em</p>
+            <p className="text-6xl font-bold tabular-nums text-slate-900">{mmss(Math.ceil(left))}</p>
+            <p className="mx-auto mt-4 max-w-md text-slate-600">Você ainda <strong>não tem posição</strong>. Quando a venda abrir, todos que estão aqui recebem um lugar aleatório ao mesmo tempo.</p>
+            <p className="mt-6 text-sm text-slate-500">👥 {crowd.toLocaleString('pt-BR')} pessoas na entrada</p>
+          </>
+        ) : (
+          <>
+            <p className="mt-6 text-sm text-slate-500">Sorteando sua posição…</p>
+            <p className="text-6xl font-bold tabular-nums text-indigo-600">#{(shown ?? 0).toLocaleString('pt-BR')}</p>
+          </>
+        )}
+      </Card>
+
+      <Card>
+        <h3 className="font-semibold text-slate-900">Por que é justo?</h3>
+        <ul className="mt-3 space-y-2 text-sm text-slate-600">
+          <li>✅ Chegar mais cedo (ou clicar mais rápido) <strong>não</strong> muda a posição sorteada.</li>
+          <li>✅ Sua conta ocupa uma única posição, em um único dispositivo.</li>
+          <li>✅ Você não precisa atualizar a página: ela avança sozinha.</li>
+        </ul>
+        <button className={`${btnGhost} mt-4`} onClick={onLeave}>Sair da entrada</button>
+      </Card>
+    </div>
+  );
+}
+
+/* ======================================================================
+   4. FILA — avança sozinha, avisa com título + som + notificação
+   ====================================================================== */
+function PaymentPref({ value, onChange }) {
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-2">
+        {[['pix', 'Pix'], ['card', 'Cartão']].map(([id, label]) => (
+          <button key={id} onClick={() => onChange({ ...value, method: id })} className={`rounded-xl border px-3 py-2.5 text-sm font-medium transition ${value.method === id ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-slate-300 hover:bg-slate-50'}`}>{label}</button>
+        ))}
+      </div>
+      {value.method === 'card' && (
+        <input className={inputCls} placeholder="Final do cartão (4 dígitos)" inputMode="numeric" value={value.last4} onChange={(e) => onChange({ ...value, last4: e.target.value.replace(/\D/g, '').slice(0, 4) })} />
+      )}
+    </div>
+  );
+}
+
+// Estimativa de estoque conforme a fila avança. Lotes pequenos (≤100) esgotam antes da sua vez.
+const projectStock = (base, pct) => Math.max(0, Math.round(base * (1 - pct / 100 / (base <= 100 ? 0.7 : 1.6))));
+
+/* Lista de ingressos gerais, exibida quando os ingressos escolhidos esgotam. */
+function Replacement({ soldOut, kept, swap, setSwap }) {
+  const [stock] = useState(readStock);
+  const [notice, setNotice] = useState('');
+  const keptQty = kept.reduce((s, i) => s + i.qty, 0);
+  const swapQty = Object.values(swap).reduce((s, n) => s + n, 0);
+  const types = kept.length + Object.values(swap).filter((n) => n > 0).length;
+  const blocked = [...soldOut, ...kept].map((i) => i.id);
+  const list = TICKETS.filter((t) => t.pool === 'general' && !blocked.includes(t.id) && stock[t.id] > 0);
+  const missing = soldOut.reduce((s, i) => s + i.qty, 0) - swapQty;
+
+  const change = (t, d) => {
+    const cur = swap[t.id] || 0;
+    setNotice('');
+    if (d > 0) {
+      if (cur >= stock[t.id]) return setNotice(`Só restam ${stock[t.id]} ingressos de ${t.name}.`);
+      if (keptQty + swapQty >= MAX_PER_PERSON) return setNotice(`Limite de ${MAX_PER_PERSON} ingressos por pessoa.`);
+      if (!cur && types >= 2) return setNotice('Você pode ter no máximo 2 tipos de ingresso.');
+    }
+    setSwap((s) => ({ ...s, [t.id]: Math.max(0, cur + d) }));
+  };
+
+  return (
+    <Card className="ring-amber-300">
+      <h3 className="font-semibold text-amber-800">⚠️ Ingressos esgotados</h3>
+      <p className="mt-1 text-sm text-slate-600">
+        Esgotaram: <strong>{soldOut.map((i) => i.name).join(', ')}</strong>. Escolha entre os ingressos gerais disponíveis
+        {missing > 0 ? ` (faltam repor ${missing})` : ' (pedido reposto ✓)'}.
+      </p>
+      <ul className="mt-3 divide-y divide-slate-100">
+        {list.map((t) => (
+          <li key={t.id} className="flex items-center justify-between gap-3 py-3">
+            <div>
+              <p className="text-sm font-medium text-slate-900">{t.name}</p>
+              <p className="text-xs text-slate-500">{brl(t.price)} · Restam {stock[t.id].toLocaleString('pt-BR')}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button className="h-8 w-8 rounded-lg border border-slate-300 hover:bg-slate-50 disabled:opacity-40" disabled={!swap[t.id]} onClick={() => change(t, -1)} aria-label={`Remover ${t.name}`}>−</button>
+              <span className="w-5 text-center text-sm font-semibold">{swap[t.id] || 0}</span>
+              <button className="h-8 w-8 rounded-lg border border-slate-300 hover:bg-slate-50" onClick={() => change(t, 1)} aria-label={`Adicionar ${t.name}`}>+</button>
+            </div>
+          </li>
+        ))}
+      </ul>
+      {notice && <div className="mt-2"><Alert tone="amber">{notice}</Alert></div>}
+    </Card>
+  );
+}
+
+function Queue({ order, start, speed, payPref, setPayPref, soundOn, onTurn, onLeave }) {
+  const pool = POOLS[order.pool];
+  const [pos, setPos] = useState(start.pos);
+  const baseStock = useRef(readStock()).current;
+  const progress = useRef(0);
+  const last = useRef(Date.now());
+  const fired = useRef(false);
+
+  useDocumentTitle(`(#${pos.toLocaleString('pt-BR')}) Fila · ${EVENT.name}`);
+
+  useEffect(() => {
+    // Baseado em tempo real: continua correto mesmo com a aba em segundo plano.
+    const id = setInterval(() => {
+      const now = Date.now();
+      const dt = (now - last.current) / 1000;
+      last.current = now;
+      progress.current += dt * pool.rate * speed * (0.8 + Math.random() * 0.4);
+      const p = Math.max(0, Math.ceil(start.pos - progress.current));
+      setPos(p);
+      if (p === 0 && !fired.current) {
+        fired.current = true;
+        onTurn(order.items.filter((i) => projectStock(baseStock[i.id], 100) < i.qty).map((i) => i.id));
+      }
+    }, 500);
+    return () => clearInterval(id);
+  }, [speed]);
+
+  const pct = (1 - pos / start.pos) * 100;
+  const eta = pos / (pool.rate * speed);
+
+  // Estimativa: quem está à frente vai consumindo o estoque (até ~60% dele).
+  const remaining = (item) => projectStock(baseStock[item.id], pct);
+  const lowFor = (item) => remaining(item) <= baseStock[item.id] * 0.5;
+  const soldOut = order.items.filter((i) => remaining(i) < i.qty);
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+      <div className="space-y-6">
+        <Card className="p-8">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <Chip tone="green">● Seu lugar está garantido</Chip>
+            <Chip>{pool.name}{order.pools.length > 1 ? ` + ${order.pools.length - 1} pool` : ''}</Chip>
+          </div>
+          <p className="mt-6 text-sm text-slate-500">Sua posição</p>
+          <p className="text-7xl font-bold tabular-nums text-slate-900">#{pos.toLocaleString('pt-BR')}</p>
+          <p className="mt-1 text-sm text-slate-500">de {start.total.toLocaleString('pt-BR')} pessoas · sorteada na abertura</p>
+
+          <div className="mt-6"><Progress value={pct} /></div>
+          <div className="mt-3 flex justify-between text-sm text-slate-600">
+            <span>{Math.max(0, pos - 1).toLocaleString('pt-BR')} pessoas à frente</span>
+            <span>Espera estimada: <strong>{fmtEta(eta)}</strong></span>
+          </div>
+          <p className="mt-6 rounded-xl bg-indigo-50 px-4 py-3 text-sm text-indigo-800">
+            {pos <= 50 ? '🔥 Quase lá! Fique nesta aba.' : '😌 Pode deixar esta aba aberta e fazer outra coisa. Não atualize a página.'}
+          </p>
+        </Card>
+
+        <Card>
+          <h3 className="font-semibold text-slate-900">Ingressos restantes do seu pedido</h3>
+          <p className="mt-1 text-xs text-slate-500">Estimativa em tempo real, conforme a fila à sua frente compra.</p>
+          <ul className="mt-4 space-y-4">
+            {order.items.map((i) => {
+              const left = remaining(i);
+              return (
+                <li key={i.id}>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-medium text-slate-800">{i.name} <span className="text-slate-400">· {POOLS[i.pool].name} · você quer {i.qty}</span></span>
+                    <span className={`tabular-nums ${left < i.qty ? 'font-semibold text-red-600' : lowFor(i) ? 'font-semibold text-amber-700' : 'text-slate-600'}`}>
+                      {left < i.qty ? '❌ Esgotado' : `${lowFor(i) ? '🔥 ' : ''}Restam ${left.toLocaleString('pt-BR')}`}
+                    </span>
+                  </div>
+                  <div className="mt-2"><Progress value={(left / baseStock[i.id]) * 100} tone={lowFor(i) ? 'red' : 'indigo'} /></div>
+                </li>
+              );
+            })}
+          </ul>
+        </Card>
+
+        {soldOut.length > 0 && (
+          <Alert tone="amber">
+            ⚠️ {soldOut.map((i) => i.name).join(', ')} {soldOut.length > 1 ? 'estão esgotados' : 'está esgotado'}. Você continua na fila: quando chegar a sua vez, vai direto para uma tela onde escolhe ingressos gerais e paga. Não será possível voltar para a fila depois.
+          </Alert>
+        )}
+
+        <Card>
+          <h3 className="font-semibold text-slate-900">Como vamos avisar você</h3>
+          <ul className="mt-3 space-y-2 text-sm text-slate-600">
+            <li>🪧 O título da aba mostra sua posição e muda para <strong>“Sua vez!”</strong>.</li>
+            <li>{soundOn ? '🔊' : '🔇'} Som de aviso {soundOn ? 'ativado' : 'desativado (ative no topo da página)'}.</li>
+            <li>🔔 Notificação do navegador, se você permitiu.</li>
+            <li>➡️ A tela avança sozinha para o pagamento.</li>
+          </ul>
+        </Card>
+      </div>
+
+      <div className="space-y-6">
+        <Card>
+          <h3 className="font-semibold text-slate-900">Prepare-se enquanto espera</h3>
+          <p className="mb-4 mt-1 text-xs text-slate-500">Escolher o pagamento agora economiza tempo depois.</p>
+          <PaymentPref value={payPref} onChange={setPayPref} />
+        </Card>
+        <Card>
+          <h3 className="font-semibold text-slate-900">Seu pedido</h3>
+          <ul className="mt-3 space-y-1 text-sm text-slate-600">
+            {order.items.map((i) => <li key={i.id} className="flex justify-between"><span>{i.qty}× {i.name}</span><span>{brl(i.qty * i.price)}</span></li>)}
+          </ul>
+          <p className="mt-3 flex justify-between border-t border-slate-100 pt-3 font-semibold"><span>Total</span><span>{brl(order.amount)}</span></p>
+          <button className={`${btnGhost} mt-4 w-full`} onClick={onLeave}>Sair da fila</button>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+/* ======================================================================
+   5. PAGAMENTO — tempo limitado com uma renovação + limite por cartão
+   ====================================================================== */
+const randomPixCode = () => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const rand = (n) => Array.from({ length: n }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  return `00020126580014br.gov.bcb.pix0136${rand(8)}-${rand(4)}-${rand(4)}-${rand(12)}5204000053039865802BR5909HORIZONTE6009SAO PAULO62070503***6304${rand(4)}`;
+};
+
+/* QR Code genérico (ilustrativo): marcadores de canto + módulos aleatórios a partir do código. */
+function QrPlaceholder({ seed, size = 21 }) {
+  let h = 0;
+  for (const c of seed) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  const next = () => (h = (h * 1664525 + 1013904223) >>> 0);
+  const inFinder = (x, y) => (x < 8 && y < 8) || (x >= size - 8 && y < 8) || (x < 8 && y >= size - 8);
+  const finder = (x, y) => {
+    const fx = x >= size - 8 ? x - (size - 8) : x;
+    const fy = y >= size - 8 ? y - (size - 8) : y;
+    if (fx > 6 || fy > 6) return false;
+    return fx === 0 || fx === 6 || fy === 0 || fy === 6 || (fx >= 2 && fx <= 4 && fy >= 2 && fy <= 4);
+  };
+  const cells = [];
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const on = inFinder(x, y) ? finder(x, y) : next() % 100 < 48;
+      if (on) cells.push(<rect key={`${x}-${y}`} x={x} y={y} width="1" height="1" />);
+    }
+  }
+  return (
+    <svg viewBox={`-2 -2 ${size + 4} ${size + 4}`} className="h-40 w-40 shrink-0 rounded-lg bg-white ring-1 ring-slate-200" role="img" aria-label="QR Code genérico de pagamento Pix" shapeRendering="crispEdges" fill="#0f172a">
+      {cells}
+    </svg>
+  );
+}
+function Checkout({ order: base, user, payPref, soldOutIds, swap, setSwap, onPaid, onExpire }) {
+  const fallback = soldOutIds.length > 0; // tela direta de compra de ingressos gerais (sem volta à fila)
+  // Pedido final: ingressos mantidos + reposição com ingressos gerais (se algo esgotou).
+  const soldOut = base.items.filter((i) => soldOutIds.includes(i.id));
+  const kept = base.items.filter((i) => !soldOutIds.includes(i.id));
+  const added = TICKETS.filter((t) => swap[t.id] > 0).map((t) => ({ ...t, qty: swap[t.id] }));
+  const items = [...kept, ...added];
+  const order = {
+    ...base,
+    items,
+    total: items.reduce((s, i) => s + i.qty, 0),
+    amount: items.reduce((s, i) => s + i.qty * i.price, 0),
+  };
+  const [deadline, setDeadline] = useState(() => Date.now() + BUY_SECONDS * 1000);
+  const [left, setLeft] = useState(BUY_SECONDS);
+  const [renewed, setRenewed] = useState(false);
+  const [method, setMethod] = useState(payPref.method);
+  const [last4, setLast4] = useState(payPref.last4);
+  const [err, setErr] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [blink, setBlink] = useState(true);
+  const [copied, setCopied] = useState(false);
+  const [pixCode] = useState(randomPixCode);
+  const settled = useRef(false);
+
+  useDocumentTitle(blink ? (fallback ? '⚠️ Ingressos esgotados' : '🎟️ Sua vez!') : `⏳ ${mmss(left)} para comprar`);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setBlink((b) => !b);
+      const l = Math.max(0, Math.round((deadline - Date.now()) / 1000));
+      setLeft(l);
+      if (l === 0 && !settled.current) { settled.current = true; onExpire(); }
+    }, 500);
+    return () => clearInterval(id);
+  }, [deadline]);
+
+  const canRenew = !renewed && left <= 90;
+  const renew = () => {
+    setDeadline((d) => Math.max(d, Date.now()) + RENEW_SECONDS * 1000);
+    setRenewed(true);
+  };
+
+  const pay = async () => {
+    setErr('');
+    if (order.total === 0) return setErr('Escolha ao menos um ingresso geral para repor o pedido.');
+    if (method === 'card' && !/^\d{4}$/.test(last4)) return setErr('Informe os 4 últimos dígitos do cartão.');
+    // Limite por cartão (independente da conta). O Pix não é vinculado a conta nem a limite.
+    const usage = store.get('fila.usage', {});
+    const key = `card:${last4}`;
+    if (method === 'card' && (usage[key] || 0) + order.total > MAX_PER_METHOD) {
+      return setErr(`Limite de ${MAX_PER_METHOD} ingressos por cartão.`);
+    }
+
+    settled.current = true;
+    setBusy(true);
+    await new Promise((r) => setTimeout(r, 1400));
+    if (method === 'card') { usage[key] = (usage[key] || 0) + order.total; store.set('fila.usage', usage); }
+    onPaid(`HZ-${Math.random().toString(36).slice(2, 8).toUpperCase()}`, order);
+  };
+
+  const copyPix = () => { try { navigator.clipboard.writeText(pixCode); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch {} };
+
+  const danger = left <= 30;
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+      <div className="space-y-6">
+        <Card className={danger ? 'ring-red-300' : 'ring-emerald-300'}>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-emerald-700">{fallback ? '🎟️ Sua vez · compra direta' : '🎉 Sua vez!'}</p>
+              <p className="text-sm text-slate-500">Conclua a compra antes que o tempo acabe.</p>
+            </div>
+            <p className={`text-4xl font-bold tabular-nums ${danger ? 'text-red-600' : 'text-slate-900'}`}>{mmss(left)}</p>
+          </div>
+          <div className="mt-4"><Progress value={(left / (BUY_SECONDS + (renewed ? RENEW_SECONDS : 0))) * 100} tone={danger ? 'red' : 'indigo'} /></div>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <button className={btnGhost} onClick={renew} disabled={!canRenew || busy}>＋ Renovar {RENEW_SECONDS / 60} min</button>
+            <span className="text-xs text-slate-500">{renewed ? 'Renovação já utilizada.' : 'Uma renovação disponível nos últimos 90 segundos.'}</span>
+          </div>
+        </Card>
+
+        {fallback && (
+          <Card className="bg-amber-50 ring-amber-300">
+            <p className="font-semibold text-amber-900">Compra direta de ingressos gerais</p>
+            <p className="mt-1 text-sm text-amber-900/80">
+              Seus ingressos de {soldOut.map((i) => i.name).join(', ')} esgotaram. Como você já passou pela fila, <strong>não é possível voltar a ela</strong>:
+              escolha a quantidade de ingressos gerais abaixo e finalize o pagamento nesta tela.
+            </p>
+          </Card>
+        )}
+
+        {fallback && <Replacement soldOut={soldOut} kept={kept} swap={swap} setSwap={setSwap} />}
+
+        <Card>
+          <h3 className="font-semibold text-slate-900">Forma de pagamento</h3>
+          <div className="mt-4 max-w-sm"><PaymentPref value={{ method, last4 }} onChange={(v) => { setMethod(v.method); setLast4(v.last4); }} /></div>
+          {method === 'pix' && (
+            <div className="mt-5 flex flex-col items-center gap-4 rounded-xl bg-slate-50 p-5 sm:flex-row sm:items-start">
+              <QrPlaceholder seed={pixCode} />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-slate-700">Pix copia e cola</p>
+                <p className="mt-2 break-all rounded-lg bg-white p-3 font-mono text-xs text-slate-600 ring-1 ring-slate-200">{pixCode}</p>
+                <button className={`${btnGhost} mt-3 !py-1.5 text-xs`} onClick={copyPix}>{copied ? '✓ Copiado' : 'Copiar código'}</button>
+                <p className="mt-3 text-xs text-slate-500">Código e QR Code gerados aleatoriamente, sem vínculo com a conta (protótipo).</p>
+              </div>
+            </div>
+          )}
+          {err && <div className="mt-4"><Alert>{err}</Alert></div>}
+          <button className={`${btnPrimary} mt-5 w-full sm:w-auto`} onClick={pay} disabled={busy}>
+            {busy ? 'Processando…' : method === 'pix' ? `Já paguei · ${brl(order.amount)}` : `Pagar ${brl(order.amount)}`}
+          </button>
+        </Card>
+      </div>
+
+      <div className="space-y-6">
+        <Card>
+          <h3 className="font-semibold text-slate-900">Resumo</h3>
+          <ul className="mt-3 space-y-1 text-sm text-slate-600">
+            {order.items.map((i) => <li key={i.id} className="flex justify-between"><span>{i.qty}× {i.name}</span><span>{brl(i.qty * i.price)}</span></li>)}
+          </ul>
+          <p className="mt-3 flex justify-between border-t border-slate-100 pt-3 font-semibold"><span>Total</span><span>{brl(order.amount)}</span></p>
+        </Card>
+        <Card>
+          <h3 className="font-semibold text-slate-900">Regras de compra</h3>
+          <ul className="mt-3 space-y-2 text-xs text-slate-600">
+            <li>👤 Ingressos nominais, vinculados ao CPF {user.cpf}.</li>
+            <li>🔢 Máx. {MAX_PER_PERSON} ingressos por pessoa.</li>
+            <li>💳 Máx. {MAX_PER_METHOD} ingressos por cartão. Cada Pix gera um código novo.</li>
+          </ul>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+/* ======================================================================
+   6. RESULTADOS
+   ====================================================================== */
+function Done({ order, user, code, onRestart }) {
+  useDocumentTitle('✅ Compra confirmada');
+  return (
+    <Card className="mx-auto max-w-xl p-8 text-center">
+      <p className="text-5xl">🎉</p>
+      <h2 className="mt-3 text-2xl font-bold text-slate-900">Compra confirmada!</h2>
+      <p className="mt-1 text-slate-500">Pedido <strong className="font-mono text-slate-800">{code}</strong></p>
+      <ul className="mx-auto mt-6 max-w-sm space-y-1 text-left text-sm text-slate-600">
+        {order.items.map((i) => <li key={i.id} className="flex justify-between"><span>{i.qty}× {i.name}</span><span>{brl(i.qty * i.price)}</span></li>)}
+        <li className="flex justify-between border-t border-slate-100 pt-2 font-semibold text-slate-900"><span>Total</span><span>{brl(order.amount)}</span></li>
+      </ul>
+      <p className="mt-4 text-xs text-slate-500">Ingressos nominais a {user.name} ({user.cpf}).</p>
+      <button className={`${btnPrimary} mt-6`} onClick={onRestart}>Voltar ao início</button>
+    </Card>
+  );
+}
+
+function Expired({ onRestart }) {
+  useDocumentTitle('⌛ Tempo esgotado');
+  return (
+    <Card className="mx-auto max-w-xl p-8 text-center">
+      <p className="text-5xl">⌛</p>
+      <h2 className="mt-3 text-2xl font-bold text-slate-900">Seu tempo acabou</h2>
+      <p className="mt-2 text-slate-600">Para ser justo com quem está na fila, liberamos seus ingressos. Você pode recomeçar pela sala de entrada.</p>
+      <button className={`${btnPrimary} mt-6`} onClick={onRestart}>Tentar novamente</button>
+    </Card>
+  );
+}
+
+/* ======================================================================
+   APP
+   ====================================================================== */
+function Header({ user, speed, setSpeed, alerts, onLogout }) {
+  return (
+    <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/90 backdrop-blur">
+      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-3">
+        <div>
+          <p className="text-sm font-bold text-slate-900">🎟️ Fila Justa</p>
+          <p className="text-xs text-slate-500">{EVENT.name}</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <label className="flex items-center gap-1.5 text-xs text-slate-500">
+            Demo
+            <select className="rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs" value={speed} onChange={(e) => setSpeed(Number(e.target.value))}>
+              <option value={1}>1× velocidade</option>
+              <option value={4}>4× velocidade</option>
+              <option value={10}>10× velocidade</option>
+            </select>
+          </label>
+          <button className={`${btnGhost} !px-3 !py-1.5 text-xs`} onClick={() => alerts.setSoundOn((s) => !s)} aria-pressed={alerts.soundOn}>{alerts.soundOn ? '🔊 Som' : '🔇 Mudo'}</button>
+          <div className="hidden items-center gap-2 sm:flex">
+            <span className="text-sm text-slate-700">{user.name.split(' ')[0]}</span>
+            <Chip tone="green">✓ Conta verificada</Chip>
+          </div>
+          <button className={`${btnGhost} !px-3 !py-1.5 text-xs`} onClick={onLogout}>Sair</button>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function App() {
+  const [user, setUser] = useState(() => store.get('fila.user'));
+  const [stage, setStage] = useState('select');
+  const [order, setOrder] = useState(null);
+  const [start, setStart] = useState(null);
+  const [orderCode, setOrderCode] = useState('');
+  const [speed, setSpeed] = useState(1);
+  const [soldOutIds, setSoldOutIds] = useState([]);
+  const [swap, setSwap] = useState({});
+  const [payPref, setPayPref] = useState({ method: 'pix', last4: '' });
+  const alerts = useAlerts();
+
+  const inQueueFlow = ['entrance', 'queue', 'checkout'].includes(stage);
+
+  // Heartbeat da posição: garante uma posição por conta.
+  useEffect(() => {
+    if (!user || !inQueueFlow) return;
+    const id = setInterval(() => seats.claim(user.cpf), 2000);
+    return () => clearInterval(id);
+  }, [user, inQueueFlow]);
+
+  useEffect(() => { if (user && !inQueueFlow) seats.release(user.cpf); }, [user, inQueueFlow]);
+
+  useEffect(() => {
+    const release = () => user && seats.release(user.cpf);
+    window.addEventListener('beforeunload', release);
+    return () => window.removeEventListener('beforeunload', release);
+  }, [user]);
+
+  const login = (u) => { store.set('fila.user', u); setUser(u); setStage('select'); };
+  const logout = () => { if (user) seats.release(user.cpf); store.del('fila.user'); setUser(null); setStage('select'); setOrder(null); };
+  const reset = () => { setStage('select'); setOrder(null); setStart(null); setSoldOutIds([]); setSwap({}); };
+
+  const join = (o) => {
+    alerts.unlock();
+    if (!seats.claim(user.cpf)) return 'Esta conta já ocupa uma posição em outra aba ou dispositivo. Uma pessoa, uma posição.';
+    setOrder(o);
+    setStage('entrance');
+    return null;
+  };
+
+  const leave = () => { if (window.confirm('Sair da fila? Você perderá sua posição.')) reset(); };
+  const drawn = (pos, total) => { setStart({ pos, total }); setStage('queue'); };
+  const turn = (ids) => { setSoldOutIds(ids); setSwap({}); alerts.alertTurn(); setStage('checkout'); };
+  const paid = (code, finalOrder) => {
+    const stock = readStock();
+    finalOrder.items.forEach((i) => { stock[i.id] = Math.max(0, stock[i.id] - i.qty); });
+    store.set('fila.stock', stock);
+    setOrder(finalOrder);
+    setOrderCode(code);
+    setStage('done');
+  };
+
+  if (!user) return <Login onLogin={login} />;
+
+  return (
+    <div className="min-h-screen">
+      <Header user={user} speed={speed} setSpeed={setSpeed} alerts={alerts} onLogout={logout} />
+      <main className="mx-auto max-w-5xl px-4 py-8">
+        <Stepper stage={stage} />
+        {stage === 'select'   && <Select user={user} onJoin={join} />}
+        {stage === 'entrance' && <Entrance order={order} speed={speed} onDrawn={drawn} onLeave={leave} />}
+        {stage === 'queue'    && <Queue order={order} start={start} speed={speed} payPref={payPref} setPayPref={setPayPref} soundOn={alerts.soundOn} onTurn={turn} onLeave={leave} />}
+        {stage === 'checkout' && <Checkout order={order} user={user} payPref={payPref} soldOutIds={soldOutIds} swap={swap} setSwap={setSwap} onPaid={paid} onExpire={() => setStage('expired')} />}
+        {stage === 'done'     && <Done order={order} user={user} code={orderCode} onRestart={reset} />}
+        {stage === 'expired'  && <Expired onRestart={reset} />}
+      </main>
+      <footer className="pb-8 text-center text-xs text-slate-400">
+        Protótipo de demonstração ·{' '}
+        <button className="underline" onClick={() => { store.del('fila.usage'); store.del('fila.active'); store.del('fila.stock'); alert('Dados da demo zerados.'); }}>zerar limites da demo</button>
+      </footer>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
