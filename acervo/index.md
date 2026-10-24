@@ -25,6 +25,8 @@ Participações como jurada.
 
 Organizei game jams e colaborei com associações. Também participei de testathons e hackathons.
 
+<p><a href="{{ '/game-creators/' | relative_url }}">Game Creators Vale do Café — conheça a comunidade de desenvolvimento de jogos do Vale do Café e Sul Fluminense →</a></p>
+
 <!-- Organizar registros por evento: nome, ano, papel, imagem e link. Diferenciar organização e participação. -->
 
 <h3 id="snx-vr-hackathon-2019">SNX.VR Hackathon — swissnex Brazil</h3>
