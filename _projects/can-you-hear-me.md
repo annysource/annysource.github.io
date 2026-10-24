@@ -1,6 +1,6 @@
 ---
 cover: /assets/images/can-you-hear-me.png
-title: "Can You Hear Me? Voice of the Oceans"
+title: "Can You Hear Me? ![alt text](image.png)Voice of the Oceans"
 role: "XR Technologist · Quality Assurance"
 organization: "Accenture · Voice of the Oceans"
 area: "XR & Educação Ambiental"

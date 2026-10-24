@@ -8,6 +8,7 @@ markdown: kramdown
 permalink: /caderno/:title/
 linkedin_url: https://www.linkedin.com/in/annysousa/
 newsletter_url: ""
+game_creators_whatsapp_url: "https://chat.whatsapp.com/IUTFz9l4b3gDpy6T6cNv9f"
 portrait: ""
 email: ""
 cv_url: ""
@@ -22,4 +23,3 @@ defaults:
     values:
       layout: project
 exclude: [README.md, Gemfile, Gemfile.lock, vendor, worker, tests, package.json, package-lock.json, preview.js, wrangler.jsonc, node_modules, .dev.vars, .wrangler]
-

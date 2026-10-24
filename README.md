@@ -16,7 +16,7 @@ Acesse http://localhost:4000. Para conferir a publicação: `bundle exec jekyll 
 - `pesquisa/index.md`, `acervo/index.md`, `sobre/index.md`: textos e registros.
 - `_data/navigation.yml`: menu.
 - `assets/style.css`: cores, fontes e responsividade.
-- `_config.yml`: newsletter_url, portrait, email, cv_url e domínio.
+- `_config.yml`: newsletter_url, game_creators_whatsapp_url, portrait, email, cv_url e domínio. Configure `game_creators_whatsapp_url` com o link de convite do grupo do WhatsApp; enquanto estiver vazio, os CTAs da página ficam desativados.
 - `en/index.md` e `es/index.md`: apresentações traduzidas. Os demais conteúdos continuam em português.
 
 ## Adicionar projeto

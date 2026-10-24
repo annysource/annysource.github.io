@@ -1,0 +1,86 @@
+---
+layout: default
+title: Game Creators Vale do Café
+description: Comunidade para conectar quem desenvolve jogos no Vale do Café e no Sul Fluminense.
+---
+{% assign whatsapp_url = site.game_creators_whatsapp_url | default: "" | strip %}
+<div class="game-creators-page">
+<section class="game-creators-hero" aria-labelledby="game-creators-title">
+  <div>
+    <p class="eyebrow">Comunidade de desenvolvimento de jogos</p>
+    <h1 id="game-creators-title">Game Creators<br>Vale do Café</h1>
+    <p class="game-creators-callout">Quem faz jogos na região precisa se conectar.</p>
+    <p class="intro">Um espaço para aproximar pessoas que criam jogos no Vale do Café e no Sul Fluminense, trocar experiências e fortalecer a cena regional.</p>
+    <div class="actions">
+      {% if whatsapp_url != "" %}
+      <a class="button" href="{{ whatsapp_url | escape }}" target="_blank" rel="noopener noreferrer">Entrar no grupo do WhatsApp</a>
+      {% else %}
+      <span class="button button-disabled" aria-disabled="true">Entrar no grupo do WhatsApp</span>
+      {% endif %}
+    </div>
+    {% if whatsapp_url == "" %}<p class="game-creators-link-note">O convite do WhatsApp será ativado quando o link estiver configurado.</p>{% endif %}
+  </div>
+  <aside class="game-creators-note">
+    <p class="handwriting">Criar jogos também é criar conexões.</p>
+    <p>Uma comunidade para compartilhar ideias, conhecer outros criadores e imaginar próximos passos para os jogos da região.</p>
+  </aside>
+</section>
+
+<section class="game-creators-section" aria-labelledby="game-creators-goals">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Uma construção coletiva</p>
+      <h2 id="game-creators-goals">O que queremos construir juntos</h2>
+    </div>
+  </div>
+  <div class="game-creators-goals">
+    <article class="game-creators-goal">
+      <h3>Conexões e colaboração</h3>
+      <p>Aproximar quem cria jogos na região e abrir espaço para conversas, trocas e colaborações que façam sentido para cada pessoa.</p>
+    </article>
+    <article class="game-creators-goal">
+      <h3>Visibilidade para os jogos da região</h3>
+      <p>Conhecer e compartilhar projetos locais, dando mais espaço às ideias e produções de quem faz jogos por aqui.</p>
+    </article>
+    <article class="game-creators-goal">
+      <h3>Conhecimento e oportunidades</h3>
+      <p>Compartilhar aprendizados, ferramentas e experiências, além de divulgar oportunidades que possam interessar à comunidade.</p>
+    </article>
+    <article class="game-creators-goal">
+      <h3>Um ecossistema regional mais forte</h3>
+      <p>Construir, em conjunto, caminhos para fortalecer o desenvolvimento de jogos no Vale do Café e no Sul Fluminense.</p>
+    </article>
+  </div>
+</section>
+
+<section class="game-creators-participants" aria-labelledby="game-creators-who">
+  <div>
+    <p class="eyebrow">Tem lugar para diferentes trajetórias</p>
+    <h2 id="game-creators-who">Quem pode participar</h2>
+    <p>Se você tem interesse em criar jogos, esta comunidade também é sua.</p>
+  </div>
+  <ul class="game-creators-roles">
+    <li>Desenvolvedores</li>
+    <li>Artistas</li>
+    <li>Game designers</li>
+    <li>Roteiristas</li>
+    <li>Músicos</li>
+    <li>Estudantes</li>
+    <li>Profissionais</li>
+    <li>Estúdios</li>
+    <li>Pessoas iniciantes</li>
+  </ul>
+</section>
+
+<section class="game-creators-final" aria-labelledby="game-creators-join">
+  <p class="eyebrow">Vamos nos conectar?</p>
+  <h2 id="game-creators-join">Faça parte da comunidade</h2>
+  <p>Entre no grupo, compartilhe seus projetos e conheça outras pessoas que também criam jogos na região.</p>
+  {% if whatsapp_url != "" %}
+  <a class="button" href="{{ whatsapp_url | escape }}" target="_blank" rel="noopener noreferrer">Entrar no grupo do WhatsApp</a>
+  {% else %}
+  <span class="button button-disabled" aria-disabled="true">Entrar no grupo do WhatsApp</span>
+  {% endif %}
+  {% if whatsapp_url == "" %}<p class="game-creators-link-note">O convite do WhatsApp será ativado quando o link estiver configurado.</p>{% endif %}
+</section>
+</div>
