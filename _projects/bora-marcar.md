@@ -6,8 +6,7 @@ area: "Engenharia de Software · Aplicação Web"
 category: autoria
 featured: true
 order: 1
-home_featured: true
-home_order: 1
+home_featured: false
 project_stage: "Aplicação implementada; testes locais automatizados disponíveis."
 problem: "Organizar horários em grupos pode gerar muitas mensagens e dificultar a visualização da disponibilidade comum."
 contribution: "Implementei uma aplicação web para criar votações de disponibilidade, compartilhar um link e visualizar os horários com maior quórum."

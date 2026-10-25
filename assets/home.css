@@ -169,8 +169,38 @@
 }
 
 .home-trajectory {
+  display: grid;
+  grid-template-columns: minmax(0, 1.85fr) minmax(240px, 1fr);
+  align-items: center;
+  gap: 44px;
   border-top: 1px solid var(--line);
   padding-top: 40px;
+}
+
+.home-trajectory-copy {
+  min-width: 0;
+}
+
+.home-trajectory-photo {
+  width: 100%;
+  max-width: 340px;
+  justify-self: center;
+  margin: 0;
+}
+
+.home-trajectory-photo img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.home-trajectory-photo figcaption {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
 }
 
 .home-trajectory h2 {
@@ -260,9 +290,19 @@
     padding: 20px;
   }
 
-  .home-trajectory,
   .home-interests,
   .home-contact {
     padding-top: 30px;
+  }
+
+  .home-trajectory {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    padding-top: 30px;
+  }
+
+  .home-trajectory-photo {
+    width: min(100%, 300px);
+    justify-self: center;
   }
 }

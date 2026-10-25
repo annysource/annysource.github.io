@@ -2,7 +2,7 @@
 layout: default
 title: Projetos
 ---
-<section class="page-heading"><p class="eyebrow">Portfólio de trabalhos</p><img class="section-icon " src="{{ '/assets/icons/projects.svg' | relative_url }}" width="64" height="64" alt="" aria-hidden="true"><h1>Engenharia, aplicações e experiências interativas.</h1><p class="intro">Conheça implementações, integrações e trabalhos de qualidade em software, IA aplicada, games e XR. Cada relato distingue minha contribuição, o contexto técnico e as evidências públicas disponíveis.</p></section>
+<section class="page-heading"><p class="eyebrow">Portfólio de trabalhos</p><img class="section-icon " src="{{ '/assets/icons/projects.svg' | relative_url }}" width="64" height="64" alt="" aria-hidden="true"><h1>Engenharia de Software, XR e QA</h1><p class="intro">Conheça implementações, integrações e trabalhos de qualidade em software, IA aplicada, games e XR. Cada relato distingue minha contribuição, o contexto técnico e as evidências públicas disponíveis.</p></section>
 <div class="filters" aria-label="Filtrar projetos" hidden><button data-filter="all" aria-pressed="true">Todos</button><button data-filter="qa" aria-pressed="false">QA & colaboração</button><button data-filter="autoria" aria-pressed="false">Criação & empreendedorismo</button><button data-filter="pesquisa" aria-pressed="false">Pesquisa</button></div>
 <p class="filter-status" aria-live="polite"></p>
 <div class="project-grid" id="em-destaque">{% assign projects = site.projects | sort: 'order' %}{% for project in projects %}{% include project-card.html project=project %}{% endfor %}</div>

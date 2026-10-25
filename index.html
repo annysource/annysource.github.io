@@ -6,8 +6,8 @@ description: Conecto necessidades de negócio, engenharia de software e qualidad
 <section class="home-hero" aria-labelledby="home-title">
   <div>
     <p class="eyebrow">Engenharia de software · Qualidade · IA aplicada</p>
-    <h1 id="home-title">Transformo necessidades de negócio em soluções de software confiáveis.</h1>
-    <p class="intro">Conecto contexto, implementação e validação para integrar sistemas, investigar falhas e reduzir retrabalho. Minha trajetória em QA, games e XR orienta como penso software: da necessidade de quem usa aos riscos técnicos da entrega.</p>
+    <h1 id="home-title">PORTFOLIO</h1>
+    <p class="intro">Engenheira de Software | Desenvolvimento Full Stack | IA Aplicada — experiência em games e tecnologias emergentes, com foco no desenvolvimento de soluções confiáveis, integração de sistemas e eficiência operacional.</p>
     <div class="actions home-actions">
       <a class="button" href="{{ '/projetos/#em-destaque' | relative_url }}">Ver projetos</a>
       {% if site.github_url and site.github_url != "" %}<a class="text-link" href="{{ site.github_url | escape }}" target="_blank" rel="noopener noreferrer">GitHub ↗</a>{% endif %}
@@ -50,11 +50,19 @@ description: Conecto necessidades de negócio, engenharia de software e qualidad
 </section>
 
 <section class="home-section home-trajectory" aria-labelledby="home-trajectory-title">
-  <p class="eyebrow">Engenharia com visão de qualidade e produto</p>
-  <h2 id="home-trajectory-title">Uma trajetória entre software, QA e experiências interativas</h2>
-  <p>Atuei como contratada em projetos ligados à Accenture, ARVORE, Kokku e Gazeus. Em equipes multidisciplinares, trabalhei com desenvolvimento de funcionalidades, investigação de falhas, validação de integrações e qualidade em games, XR e aplicações com IA.</p>
-  <p>Também sou fundadora da <a href="{{ '/inaluzcria/' | relative_url }}">Inaluz Cria</a>, onde conecto objetivos de clientes, produção e tecnologia, e do <a href="{{ '/qa-game-hub/' | relative_url }}">QA Game Hub</a>, voltado à formação em QA para games e ao apoio a estúdios independentes.</p>
-  <p>Minha formação é em Tecnologia em Jogos Digitais. Também atuei como pesquisadora civil na Escola de Guerra Naval. Essas experiências ampliaram minha atenção ao contexto de uso, aos requisitos e às consequências das decisões técnicas.</p>
+  <div class="home-trajectory-copy">
+    <p class="eyebrow">Engenharia com visão de qualidade e produto</p>
+    <h2 id="home-trajectory-title">Uma carreira entre software, QA e experiências interativas</h2>
+    <p>Atuei como contratada em projetos ligados à Accenture, ARVORE, Kokku e Gazeus. Em equipes multidisciplinares, trabalhei com desenvolvimento de funcionalidades, investigação de falhas, validação de integrações e qualidade em games, XR e aplicações com IA.</p>
+    <p>Também sou fundadora da <a href="{{ '/inaluzcria/' | relative_url }}">Inaluz Cria</a>, onde conecto objetivos de clientes, produção e tecnologia, e do <a href="{{ '/qa-game-hub/' | relative_url }}">QA Game Hub</a>, voltado à formação em QA para games e ao apoio a estúdios independentes.</p>
+    <p>Minha formação é em Tecnologia em Jogos Digitais e atuei como pesquisadora civil na Escola de Guerra Naval. Atualmente, curso MBA em Engenharia de Software na UFRJ, MBA em Engenharia de Software com IA Aplicada na UNIPDS e MBA em Engenharia DevOps na Faculdade Focus. Essas experiências ampliam minha atenção ao contexto de uso, aos requisitos e às consequências das decisões técnicas.</p>
+  </div>
+  {% if site.portrait and site.portrait != "" %}
+  <figure class="home-trajectory-photo">
+    <img src="{{ site.portrait | relative_url }}" alt="Foto de perfil de Anny Sousa" loading="lazy">
+    <figcaption>Accenture | Porto Digital</figcaption>
+  </figure>
+  {% endif %}
 </section>
 
 <section class="home-section home-interests" aria-labelledby="home-interests-title">

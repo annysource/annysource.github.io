@@ -10,6 +10,12 @@ technologies: [Unity, "C#", k6, LLMs, "Prompt Tester", "OVR Metrics"]
 category: qa
 featured: true
 order: 4
+home_featured: true
+home_order: 4
+problem: "Identificar falhas de gameplay e interação em VR, ampliar a cobertura de testes e apoiar a priorização de correções."
+contribution: "Atuei em QA, testando gameplay, analisando defeitos e riscos e criando materiais para apoiar a cobertura de testes e a comunicação entre equipes."
+evidence_summary: "Modelos de análise de issues, cobertura por level e relatórios de saúde das builds no Jira e Confluence."
+project_stage: "Um ano de desenvolvimento e validação, incluindo feature freeze e testes para as lojas."
 summary: "Jogo de ação em realidade virtual ambientado no universo de The Boys, disponível para PlayStation VR2 e Meta Quest."
 gallery:
   - src: /assets/images/the-boys-01.jpeg
