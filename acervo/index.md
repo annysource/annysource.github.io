@@ -25,7 +25,13 @@ Participações como jurada.
 
 Organizei game jams e colaborei com associações. Também participei de testathons e hackathons.
 
-<p><a href="{{ '/game-creators/' | relative_url }}">Game Creators Vale do Café — conheça a comunidade de desenvolvimento de jogos do Vale do Café e Sul Fluminense →</a></p>
+<h3 id="game-creators-vale-do-cafe">Game Creators Vale do Café</h3>
+
+**Fundadora · Comunidade e organização**
+
+Idealização e articulação da comunidade, conectando criadores de jogos da região e fortalecendo a cena local.
+
+<p><a href="{{ '/game-creators/' | relative_url }}">Conheça a Game Creators Vale do Café — comunidade de desenvolvimento de jogos do Vale do Café e Sul Fluminense →</a></p>
 
 <!-- Organizar registros por evento: nome, ano, papel, imagem e link. Diferenciar organização e participação. -->
 
