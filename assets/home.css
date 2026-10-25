@@ -1,0 +1,268 @@
+.home-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(240px, .8fr);
+  align-items: center;
+  gap: 72px;
+  padding: 72px 0 64px;
+}
+
+.home-hero h1 {
+  max-width: 19ch;
+  font-size: clamp(40px, 4.4vw, 62px);
+}
+
+.home-hero .intro {
+  max-width: 64ch;
+}
+
+.home-hero-note {
+  align-self: center;
+  border-left: 2px solid var(--line);
+  padding: 8px 0 8px 28px;
+  font-size: 15px;
+}
+
+.home-hero-mascot {
+  width: 82px;
+  height: 82px;
+  object-fit: contain;
+  margin-bottom: 12px;
+}
+
+.home-hero-note .handwriting {
+  color: var(--accent);
+  font-size: 25px;
+}
+
+.home-hero-note > a {
+  display: inline-block;
+  margin-top: 2px;
+}
+
+.home-section {
+  margin: 0 0 72px;
+}
+
+.home-section > h2 {
+  margin-bottom: 24px;
+}
+
+.home-problem-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 32px;
+}
+
+.home-problem-grid article {
+  border-top: 1px solid var(--line);
+  padding: 22px 0 8px;
+}
+
+.home-problem-grid h3 {
+  margin: 0 0 8px;
+}
+
+.home-problem-grid p,
+.home-trajectory p,
+.home-contact > p:not(.eyebrow) {
+  max-width: 75ch;
+  font-size: 16px;
+}
+
+.home-featured .section-heading {
+  align-items: end;
+  margin-bottom: 22px;
+}
+
+.home-featured .section-heading h2 {
+  margin: 0;
+}
+
+.home-project-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.home-project-card {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.home-project-cover {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #edf0eb;
+}
+
+.home-project-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.home-project-cover-empty img {
+  width: 56px;
+  height: 56px;
+  opacity: .7;
+}
+
+.home-project-copy {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 22px;
+}
+
+.home-project-copy .eyebrow {
+  margin-bottom: 6px;
+}
+
+.home-project-copy h3 {
+  margin: 0 0 14px;
+}
+
+.home-project-copy h3 a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.home-project-copy > p {
+  font-size: 14px;
+  line-height: 1.55;
+  margin-bottom: 12px;
+}
+
+.home-project-copy strong {
+  font-weight: 500;
+}
+
+.home-project-stack {
+  color: var(--muted);
+}
+
+.home-project-evidence,
+.home-project-stage {
+  color: var(--muted);
+}
+
+.home-project-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.home-project-links .text-link {
+  font-size: 13px;
+}
+
+.home-trajectory {
+  border-top: 1px solid var(--line);
+  padding-top: 40px;
+}
+
+.home-trajectory h2 {
+  max-width: 32ch;
+}
+
+.home-interests {
+  border-top: 1px solid var(--line);
+  padding-top: 40px;
+}
+
+.home-interest-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 32px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.home-interest-list li {
+  border-top: 1px solid var(--line);
+  padding: 13px 0;
+}
+
+.home-contact {
+  border-top: 1px solid var(--line);
+  padding: 40px 0 8px;
+}
+
+.home-contact h2 {
+  max-width: 28ch;
+}
+
+.home-contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-top: 24px;
+}
+
+.home-contact-links a {
+  font-size: 15px;
+}
+
+@media (max-width: 1050px) {
+  .home-hero {
+    gap: 40px;
+  }
+
+  .home-project-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .home-hero {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 46px 0 42px;
+  }
+
+  .home-hero h1 {
+    font-size: clamp(38px, 9vw, 52px);
+  }
+
+  .home-hero-note {
+    padding-left: 22px;
+  }
+
+  .home-section {
+    margin-bottom: 48px;
+  }
+
+  .home-problem-grid,
+  .home-project-grid,
+  .home-interest-list {
+    grid-template-columns: 1fr;
+  }
+
+  .home-featured .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .home-project-copy {
+    padding: 20px;
+  }
+
+  .home-trajectory,
+  .home-interests,
+  .home-contact {
+    padding-top: 30px;
+  }
+}

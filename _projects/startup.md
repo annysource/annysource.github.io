@@ -4,7 +4,7 @@ role: Criação & empreendedorismo
 area: Jogos autorais
 category: autoria
 featured: false
-order: 6
+order: 9
 summary: Trajetória em startups de jogos, entre projetos apoiados por fomento e jogos casuais para marcas.
 ---
 ## Jogos, negócios e criação

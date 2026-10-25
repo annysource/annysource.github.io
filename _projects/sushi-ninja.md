@@ -6,7 +6,7 @@ organization: "INÁ · Agência Traços · Frescatto"
 area: "Games & Ativação de Marca"
 category: autoria
 featured: true
-order: 7
+order: 6
 summary: "Jogo desenvolvido sob encomenda para a ativação da Frescatto no Taste São Paulo e Rio Gastronomia, conectando os objetivos da marca a uma experiência interativa em tela touch."
 youtube_id: "jTfiujMsidk"
 video_cover: /assets/images/sushi-ninja-video.png

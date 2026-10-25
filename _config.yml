@@ -1,15 +1,17 @@
 title: Anny Caroline Sousa
-description: "Anny Sousa — Creative Technologist com foco em Quality Engineering. Games, XR, experiências interativas e pesquisa aplicada."
+description: "Anny Sousa conecta engenharia de software, qualidade e IA aplicada para desenvolver e validar soluções confiáveis."
 author: Anny Caroline Sousa
-url: "https://annysource.github.io"
+url: "https://annysousa.dev"
 baseurl: ""
 lang: pt-BR
 markdown: kramdown
 permalink: /caderno/:title/
 linkedin_url: https://www.linkedin.com/in/annysousa/
+github_url: https://github.com/annysource
 newsletter_url: ""
 game_creators_whatsapp_url: "https://chat.whatsapp.com/IUTFz9l4b3gDpy6T6cNv9f"
 qa_game_hub_whatsapp_url: "https://wa.me/5521988503103?text=Ol%C3%A1%21%20Gostaria%20de%20solicitar%20um%20or%C3%A7amento%20de%20QA%20para%20meu%20jogo."
+qa_game_hub_ebook_url: "/assets/documents/fluxodevalidacao.pdf"
 portrait: ""
 email: ""
 cv_url: ""

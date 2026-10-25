@@ -9,7 +9,7 @@ area: VR & Experiências Interativas
 technologies: [Unity, "C#"]
 category: autoria
 featured: true
-order: 8
+order: 7
 summary: Intervenção no mundo virtual HanaHana que conecta sopro, movimento das mãos e música, criada em equipe e reconhecida com o terceiro lugar no SNX.VR Hackathon.
 youtube_id: 92lbYq7baDE
 video_title: Registro do SNX.VR Hackathon — HanaHana

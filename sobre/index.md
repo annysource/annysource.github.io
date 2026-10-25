@@ -4,29 +4,29 @@ title: Sobre mim
 kicker: Anny Caroline
 ---
 
-## Qualidade e investigação técnica
+## Como trabalho
 
-Atuo com QA, investigação de defeitos, processos de qualidade e análise da saúde de builds. Colaborei como contratada da Accenture, ARVORE, Kokku e Gazeus.
+Parto do problema e do contexto de uso para entender requisitos, integrações e riscos. Conecto implementação e validação: investigo falhas, organizo evidências e trabalho com as equipes para orientar prioridades e evitar retrabalho.
 
-## Desenvolvimento e experiências imersivas
+## Experiência profissional
 
-Minha formação é em Tecnologia em Jogos Digitais. Trabalho com desenvolvimento e validação de games, XR e experiências interativas.
+Colaborei como contratada em projetos da Accenture, ARVORE, Kokku e Gazeus. Minha experiência inclui investigação de defeitos, análise de builds, desenvolvimento de funcionalidades em XR, validação de integrações e apoio à qualidade de games e experiências com IA.
 
-## Empreendedorismo e produção — Inaluz Cria
+## Engenharia, games e XR
 
-Sou fundadora da Inaluz Cria. Na criação e produção de jogos e experiências interativas, conecto objetivos de clientes, decisões criativas, equipe e qualidade da entrega.
+Sou formada em Tecnologia em Jogos Digitais. Em projetos de games e XR, trabalhei tanto na implementação de funcionalidades quanto na validação de comportamentos, performance e requisitos de plataforma.
 
-## Formação e processos — QA Game HUB
+## IA aplicada
 
-Sou fundadora do QA Game HUB. Formo profissionais de QA e apoio estúdios indie na estruturação de processos, acompanhamento de qualidade e diagnóstico da saúde de builds.
+Em projetos com IA generativa, colaborei na validação de prompts e de retornos de API, aproximando expectativas de produto, desenvolvimento e experiência. Minha atuação e seus limites estão descritos nos cases públicos.
 
-## Pesquisa aplicada
+## Iniciativas
 
-Atuei como pesquisadora civil na Escola de Guerra Naval. Também publiquei artigo acadêmico.
+Sou fundadora da [Inaluz Cria]({{ '/inaluzcria/' | relative_url }}), iniciativa de criação e produção de jogos e experiências interativas, e do [QA Game HUB]({{ '/qa-game-hub/' | relative_url }}), voltado a formação em QA para games e apoio a estúdios independentes.
 
-## Competências
+Também atuei como pesquisadora civil na Escola de Guerra Naval e publiquei artigo acadêmico.
 
-**Experiência aplicada**
+## Conhecimentos aplicados
 
 - Games e XR QA.
 - Investigação de defeitos e processos de qualidade.
@@ -35,14 +35,15 @@ Atuei como pesquisadora civil na Escola de Guerra Naval. Também publiquei artig
 - Performance e carga.
 - Desenvolvimento com Unity, Unreal, C# e C++.
 
-**Em aprofundamento**
+## Em aprofundamento
 
 - Playwright, Cypress e Pytest.
 - CI/CD, DevOps e observabilidade.
+- Engenharia de software, backend, arquitetura e desenvolvimento de aplicações com IA.
 
 ## Contato
 
-Vamos conversar sobre qualidade em games, experiências imersivas e tecnologias emergentes.
+Estou aberta a oportunidades em engenharia de software e desenvolvimento de aplicações com IA.
 
 [Meu LinkedIn]({{ site.linkedin_url }})
 {% if site.workana_url and site.workana_url != "" %}[Contrate pelo Workana]({{ site.workana_url }}){% endif %}

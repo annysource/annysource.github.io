@@ -12,11 +12,11 @@ Acesse http://localhost:4000. Para conferir a publicação: `bundle exec jekyll 
 
 ## Editar
 - `index.html`: início.
-- `_projects/*.md`: casos. Os três atuais são pontos de partida com informações que você relatou e comentários para completar.
+- `_projects/*.md`: estudos de caso e projetos. Os destaques da página inicial são definidos com `home_featured` e `home_order`; use somente contribuições, links e evidências que possam ser publicados.
 - `pesquisa/index.md`, `acervo/index.md`, `sobre/index.md`: textos e registros.
 - `_data/navigation.yml`: menu.
 - `assets/style.css`: cores, fontes e responsividade.
-- `_config.yml`: newsletter_url, game_creators_whatsapp_url, portrait, email, cv_url e domínio. Configure `game_creators_whatsapp_url` com o link de convite do grupo do WhatsApp; enquanto estiver vazio, os CTAs da página ficam desativados.
+- `_config.yml`: newsletter_url, github_url, game_creators_whatsapp_url, qa_game_hub_ebook_url, portrait, email, cv_url e domínio. Configure `cv_url` para exibir o currículo e `github_url` para apontar ao perfil público. Configure `game_creators_whatsapp_url` com o link de convite do grupo do WhatsApp. Para liberar o e-book do QA Game HUB, adicione o PDF em `assets/documents/qa-fluxo-validacao.pdf` e configure `qa_game_hub_ebook_url` com esse caminho.
 - `en/index.md` e `es/index.md`: apresentações traduzidas. Os demais conteúdos continuam em português.
 
 ## Adicionar projeto

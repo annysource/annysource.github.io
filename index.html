@@ -1,14 +1,84 @@
 ---
 layout: default
-description: Portfolio de Anny Caroline Creative Technologist com foco em QA, games, XR, IA e pesquisa.
+title: Anny Sousa — Engenharia de software e IA aplicada
+description: Conecto necessidades de negócio, engenharia de software e qualidade para desenvolver e validar soluções confiáveis. Experiência em games, XR e IA aplicada.
 ---
-<section class="hero"><div><p class="eyebrow">Games · XR · IA · Pesquisa Aplicada</p><h1>Criatividade e eficiência<br>operacional.</h1>
-    <p class="intro">Atender requisitos, fortalecer a confiança das partes interessadas, prevenir retrabalho e reduzir custos operacionais são atividades do meu dia a dia. Para tal, utilizo meus conhecimentos em games, tecnologias emergentes e engenharia de software com IA Aplicada.</p><div class="actions"><a class="button" href="{{ '/projetos/' | relative_url }}">Explorar projetos</a><a class="text-link" href="{{ '/sobre/' | relative_url }}">Sobre mim →</a></div></div><aside class="personal-note">{% if site.portrait != "" %}<img class="portrait" src="{{ site.portrait | relative_url }}" alt="Anny Caroline Sousa">{% endif %}<p class="handwriting">Prototipar. Validar. Escalar.</p><p>Entre a ideia e a experiência de quem usa, transformo riscos técnicos em experiências encantadoras e escaláveis.</p><a href="{{ site.linkedin_url }}">Vamos conversar ↗</a></aside></section>
-<section class="section"><div class="section-heading"><div><p class="eyebrow">Trabalhos selecionados</p><h2 class="icon-heading"><img class="section-icon " src="{{ '/assets/icons/qa.svg' | relative_url }}" width="64" height="64" alt="" aria-hidden="true"><span>Da ideia à experiência</span></h2></div><a class="text-link" href="{{ '/projetos/' | relative_url }}">Todos os projetos →</a></div><div class="project-grid">{% assign projects = site.projects | sort: 'order' %}{% for project in projects %}{% if project.featured %}{% include project-card.html project=project %}{% endif %}{% endfor %}</div></section>
-<section class="initiatives section" aria-labelledby="initiatives-title"><p class="eyebrow">Creative Technologist · Quality Engineering</p><h2 id="initiatives-title">Iniciativas</h2><p><a class="text-link" href="{{ '/empreendedorismo/' | relative_url }}">Conheça minha atuação em empreendedorismo →</a></p><div class="initiatives-grid">
-<article class="initiative"><h3>Inaluz Cria</h3><p>Criação e produção de jogos e experiências interativas, conectando objetivos do cliente, decisões criativas e qualidade da entrega.</p><p>Como fundadora, coordeno profissionais, alinho requisitos e expectativas com clientes e documento decisões criativas e técnicas. Já recebi fomento por edital Startup Rio e BNDES para jogos autorais que utilizam o território real como mecânica.</p><p class="initiative-links"><strong>Projetos relacionados:</strong> <a href="{{ '/projetos/sushi-ninja/' | relative_url }}">Sushi Ninja: ativações Frescatto no Taste São Paulo e no Rio Gastronomia</a>; <a href="{{ '/projetos/periodo-defeso/' | relative_url }}">Defeso Game: ativações Frescatto encomendado em 2024</a> </p></article>
-<article class="initiative"><h3><a href="{{ '/qa-game-hub/' | relative_url }}">QA Game HUB</a></h3><p>Formação de profissionais de QA e apoio a estúdios indie na estruturação de processos e no diagnóstico de saúde de builds.</p><p>Como fundadora, desenvolvo o trabalho de formação e apoio às práticas de qualidade dos estúdios.</p></article>
-<article class="initiative initiative-community"><h3>Game Creators Vale do Café</h3><p>Uma comunidade para conectar quem desenvolve jogos no Vale do Café e no Sul Fluminense.</p><p>Queremos aproximar criadores, compartilhar projetos e fortalecer o ecossistema regional de jogos.</p><p class="initiative-links"><a class="text-link" href="{{ '/game-creators/' | relative_url }}">Conheça a iniciativa →</a></p></article>
-</div></section>
-<section class="paths section"><a href="{{ '/pesquisa/' | relative_url }}"><img class="section-icon " src="{{ '/assets/icons/research.svg' | relative_url }}" width="64" height="64" alt="" aria-hidden="true"><h2>Pesquisa & publicações</h2><p>Pesquisa aplicada, artigos e produção de conhecimento.</p><span>Explorar →</span></a><a href="{{ '/acervo/#comunidade' | relative_url }}"><img class="section-icon " src="{{ '/assets/icons/encounters.svg' | relative_url }}" width="64" height="64" alt="" aria-hidden="true"><h2>Comunidade & encontros</h2><p>Game jams, associações, palestras e experiências coletivas.</p><span>Explorar →</span></a><a href="{{ '/acervo/#midia' | relative_url }}"><img class="section-icon " src="{{ '/assets/icons/media.svg' | relative_url }}" width="64" height="64" alt="" aria-hidden="true"><h2>Conversas & acervo</h2><p>Entrevistas, podcasts e registros da trajetória.</p><span>Explorar →</span></a></section>
-{% include notebook.html %}
+<section class="home-hero" aria-labelledby="home-title">
+  <div>
+    <p class="eyebrow">Engenharia de software · Qualidade · IA aplicada</p>
+    <h1 id="home-title">Transformo necessidades de negócio em soluções de software confiáveis.</h1>
+    <p class="intro">Conecto contexto, implementação e validação para integrar sistemas, investigar falhas e reduzir retrabalho. Minha trajetória em QA, games e XR orienta como penso software: da necessidade de quem usa aos riscos técnicos da entrega.</p>
+    <div class="actions home-actions">
+      <a class="button" href="{{ '/projetos/#em-destaque' | relative_url }}">Ver projetos</a>
+      {% if site.github_url and site.github_url != "" %}<a class="text-link" href="{{ site.github_url | escape }}" target="_blank" rel="noopener noreferrer">GitHub ↗</a>{% endif %}
+      {% if site.cv_url and site.cv_url != "" %}<a class="text-link" href="{{ site.cv_url | relative_url }}">Currículo ↗</a>{% endif %}
+    </div>
+  </div>
+  <aside class="home-hero-note">
+    <img class="home-hero-mascot" src="{{ '/assets/images/joaninha.png' | relative_url }}" alt="" width="96" height="96">
+    <p class="handwriting">Entender. Construir. Validar.</p>
+    <p>Qualidade é parte da engenharia: ajuda a tomar decisões melhores antes que problemas virem retrabalho.</p>
+    <a href="{{ site.linkedin_url | escape }}" target="_blank" rel="noopener noreferrer">Vamos conversar ↗</a>
+  </aside>
+</section>
+
+<section class="home-section" aria-labelledby="home-problems-title">
+  <p class="eyebrow">Como contribuo</p>
+  <h2 id="home-problems-title">O que ajudo a resolver</h2>
+  <div class="home-problem-grid">
+    <article><h3>Integrações que precisam funcionar juntas</h3><p>Investigo fluxos entre interface, serviços e APIs para localizar inconsistências e apoiar uma entrega previsível.</p></article>
+    <article><h3>Falhas difíceis de reproduzir</h3><p>Organizo evidências, condições e passos para entender o comportamento e aproximar QA, desenvolvimento e produto.</p></article>
+    <article><h3>Riscos técnicos pouco visíveis</h3><p>Relaciono requisitos, uso esperado e limitações da plataforma para identificar pontos críticos antes e durante a implementação.</p></article>
+    <article><h3>Retrabalho e esforço operacional</h3><p>Ajudo a esclarecer critérios e prioridades para evitar correções tardias e concentrar o esforço no que afeta a experiência.</p></article>
+  </div>
+</section>
+
+<section class="home-section home-featured" id="em-destaque" aria-labelledby="home-projects-title">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Implementação, integrações e validação</p>
+      <h2 id="home-projects-title">Projetos em destaque</h2>
+    </div>
+    <a class="text-link" href="{{ '/projetos/' | relative_url }}">Explorar todos os projetos →</a>
+  </div>
+  <div class="home-project-grid">
+    {% assign highlighted_projects = site.projects | where: 'home_featured', true | sort: 'home_order' %}
+    {% for project in highlighted_projects %}
+      {% include home-project-card.html project=project %}
+    {% endfor %}
+  </div>
+</section>
+
+<section class="home-section home-trajectory" aria-labelledby="home-trajectory-title">
+  <p class="eyebrow">Engenharia com visão de qualidade e produto</p>
+  <h2 id="home-trajectory-title">Uma trajetória entre software, QA e experiências interativas</h2>
+  <p>Atuei como contratada em projetos ligados à Accenture, ARVORE, Kokku e Gazeus. Em equipes multidisciplinares, trabalhei com desenvolvimento de funcionalidades, investigação de falhas, validação de integrações e qualidade em games, XR e aplicações com IA.</p>
+  <p>Também sou fundadora da <a href="{{ '/inaluzcria/' | relative_url }}">Inaluz Cria</a>, onde conecto objetivos de clientes, produção e tecnologia, e do <a href="{{ '/qa-game-hub/' | relative_url }}">QA Game Hub</a>, voltado à formação em QA para games e ao apoio a estúdios independentes.</p>
+  <p>Minha formação é em Tecnologia em Jogos Digitais. Também atuei como pesquisadora civil na Escola de Guerra Naval. Essas experiências ampliaram minha atenção ao contexto de uso, aos requisitos e às consequências das decisões técnicas.</p>
+</section>
+
+<section class="home-section home-interests" aria-labelledby="home-interests-title">
+  <p class="eyebrow">Em prática e aprofundamento</p>
+  <h2 id="home-interests-title">Interesses técnicos</h2>
+  <ul class="home-interest-list">
+    <li>Engenharia de software e desenvolvimento de aplicações</li>
+    <li>Backend, APIs e integração entre sistemas</li>
+    <li>IA aplicada e validação de aplicações com modelos de linguagem</li>
+    <li>Arquitetura de software e decisões técnicas</li>
+    <li>Observabilidade, desempenho e automação de testes</li>
+  </ul>
+</section>
+
+<section class="home-section home-contact" aria-labelledby="home-contact-title">
+  <p class="eyebrow">Contato</p>
+  <h2 id="home-contact-title">Vamos conversar sobre software e tecnologia?</h2>
+  <p>Estou aberta a oportunidades em engenharia de software e desenvolvimento de aplicações com IA. Para conhecer meu trabalho ou conversar sobre uma oportunidade:</p>
+  <div class="home-contact-links">
+    <a href="{{ site.linkedin_url | escape }}" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
+    {% if site.github_url and site.github_url != "" %}<a href="{{ site.github_url | escape }}" target="_blank" rel="noopener noreferrer">GitHub ↗</a>{% endif %}
+    {% if site.cv_url and site.cv_url != "" %}<a href="{{ site.cv_url | relative_url }}">Currículo ↗</a>{% endif %}
+    {% if site.email and site.email != "" %}<a href="mailto:{{ site.email | escape }}">Email</a>{% endif %}
+    <a href="{{ '/caderno/' | relative_url }}">Caderno</a>
+    <a href="{{ '/acervo/' | relative_url }}">Acervo</a>
+  </div>
+</section>

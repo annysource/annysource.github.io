@@ -5,7 +5,17 @@ organization: "Accenture Brasil"
 area: "IA Generativa & Experiências Interativas"
 category: qa
 featured: true
-order: 3
+order: 2
+home_featured: true
+home_order: 2
+problem: "A experiência precisava tornar uma interação com IA generativa compreensível e coerente para o público, conectando conversa, conteúdo gerado e interface."
+contribution: "Colaborei na integridade dos prompts e validei retornos da API com as equipes de backend e web design; também trabalhei com arte 3D e UX."
+evidence_summary: "Vídeo público da experiência; testes, métricas e código interno não estão publicados."
+technologies: ["Modelo de linguagem", "API", "Stable Diffusion", "Avatar 3D"]
+home_context: "IA generativa · API · Stable Diffusion · arte 3D · validação"
+evidence_url: "https://www.youtube.com/watch?v=HhuxziWQs-s"
+evidence_label: Vídeo
+project_stage: "Projeto profissional concluído; relato limitado às contribuições públicas."
 cover: /assets/images/galo-casa-zero.jpg
 summary: "Colaboração com arte 3D, UX, web design e backend em uma experiência educativa com IA generativa, incluindo validação de prompts e retornos de API."
 youtube_id: HhuxziWQs-s
@@ -54,6 +64,12 @@ Essa colaboração aproximava os aspectos técnicos da geração das decisões c
 Colaborei com QA e integridade dos prompts, considerando a correspondência entre as instruções utilizadas e as saídas esperadas.
 
 Em conjunto com desenvolvimento backend e web design, validei os retornos da API e sua relação com o comportamento esperado na interface, apoiando a investigação de problemas entre as etapas da aplicação.
+
+## Integrações e validação
+
+A experiência articulava uma conversa mediada por modelo de linguagem, retornos de API, uma interface web e a geração de um avatar 3D. Trabalhei na validação de prompts e retornos da API em colaboração com as equipes responsáveis; o desenvolvimento do backend e da interface foi realizado em equipe.
+
+Não há testes automatizados, métricas de qualidade ou código do projeto publicados neste portfólio. A evidência pública disponível é o registro em vídeo da experiência.
 
 ## Experiência e colaboração com UX
 

@@ -9,7 +9,7 @@ area: "Games & XR"
 technologies: [Unity, "C#", k6, LLMs, "Prompt Tester", "OVR Metrics"]
 category: qa
 featured: true
-order: 1
+order: 4
 summary: "Jogo de ação em realidade virtual ambientado no universo de The Boys, disponível para PlayStation VR2 e Meta Quest."
 gallery:
   - src: /assets/images/the-boys-01.jpeg

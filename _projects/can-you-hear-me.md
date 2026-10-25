@@ -1,12 +1,22 @@
 ---
 cover: /assets/images/can-you-hear-me.png
-title: "Can You Hear Me? ![alt text](image.png)Voice of the Oceans"
+title: "Can You Hear Me? — Voice of the Oceans"
 role: "XR Technologist · Quality Assurance"
 organization: "Accenture · Voice of the Oceans"
 area: "XR & Educação Ambiental"
 category: qa
 featured: true
-order: 2
+order: 3
+home_featured: true
+home_order: 3
+problem: "A experiência precisava combinar exploração em realidade virtual com interações compreensíveis e desempenho adequado no Meta Quest 2."
+contribution: "Implementei localização, tutorial e funcionalidades da experiência; também investiguei performance e participei das verificações de VRC."
+evidence_summary: "Listagem pública na Meta Quest Store; código e relatórios internos não são públicos."
+technologies: ["Meta Quest 2", "Meta Store", "VRC"]
+home_context: "Realidade virtual · localização · tutorial · performance · requisitos Meta Store"
+evidence_url: "https://www.meta.com/pt-br/experiences/can-you-hear-me/6818170608231575/"
+evidence_label: Meta Quest Store
+project_stage: "Experiência publicada na Meta Quest Store."
 summary: "Desenvolvimento e qualidade de uma experiência VR sobre poluição dos oceanos, com atuação em performance, localização, tutorial e requisitos da Meta Store. "
 gallery:
   - src: /assets/images/can-you-hear-me-01.WEBP
@@ -25,6 +35,7 @@ gallery:
 
 ## Sobre o projeto
 
+**Etapa:** experiência publicada na Meta Quest Store.
 
 Can You Hear Me? é uma experiência em realidade virtual desenvolvida pela Accenture para a organização Voice of the Oceans, dedicada ao combate à poluição dos oceanos.
 
@@ -55,6 +66,10 @@ Atuei na otimização e na investigação de performance, realizando ajustes par
 
 Participei das verificações de VRC e da adequação aos requisitos da Meta Store, contribuindo para a preparação técnica da aplicação para submissão.
 
+## Evidências
+
+A listagem na Meta Quest Store é uma evidência pública de publicação. Os testes, métricas de desempenho e detalhes de código são internos e não estão publicados neste relato.
+
 ## Experiência em exposição
 
 O projeto foi apresentado na WSL, em Saquarema, em parceria com Natura Kaiak. Também passou pelo Bradesco inovabra e pelo Festival Futuros Possíveis, na Casa Firjan, no Rio de Janeiro.
@@ -70,4 +85,3 @@ Fotografias e vídeo documentam a experiência em uso, os espaços de apresenta�
 ## Confidencialidade
 
 Este relato apresenta minhas contribuições sem divulgar código proprietário, documentos internos ou detalhes técnicos confidenciais.
-
