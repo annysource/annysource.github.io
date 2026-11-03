@@ -10,7 +10,7 @@
   {% endif %}
   <div class="home-project-copy">
     <p class="eyebrow">{{ include.project.area }}</p>
-    <h3><a href="{{ include.project.url | relative_url }}">{{ include.project.title }}</a></h3>
+    <h3><a href="{{ include.project.url | relative_url }}">{{ include.project.card_title | default: include.project.title }}</a></h3>
     <p><strong>Problema:</strong> {{ include.project.problem }}</p>
     <p><strong>Minha contribuição:</strong> {{ include.project.contribution }}</p>
     {% if include.project.home_context %}

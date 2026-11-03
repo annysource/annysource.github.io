@@ -14,6 +14,7 @@ My experience includes QA on The Boys alongside Ricardo Laganaro, research at th
 
 ## Selected work
 
+- [QA Test Case Recommender — regression test recommendations from Pull Requests]({{ '/projetos/qa-test-case-recommender/' | relative_url }})
 - [DevOnboard XR — developer onboarding in virtual reality]({{ '/projetos/devonboard-xr/' | relative_url }})
 - [The Boys: Trigger Warning]({{ '/projetos/the-boys/' | relative_url }})
 - [Applied research]({{ '/projetos/pesquisa-egn/' | relative_url }})

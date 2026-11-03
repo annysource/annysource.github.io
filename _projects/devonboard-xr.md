@@ -31,13 +31,34 @@ gallery:
     caption: "Resposta Mock exibida no ambiente XR."
 ---
 
-## Contexto
+## Etapa 1 · MBA UFRJ
 
-DevOnboard XR é uma experiência de onboarding para desenvolvedores em realidade virtual. O projeto reúne um cliente XR, uma API em Python, um agente conectado ao Google Gemini e um painel web com chat.
+### DevOnboard — concepção da solução
+
+Projeto acadêmico desenvolvido em grupo na disciplina **Ferramentas para Geração de Ideias**, do MBA em Engenharia de Software da UFRJ. A equipe investigou o problema do onboarding técnico e a dificuldade de novos desenvolvedores para encontrar informações, compreender a arquitetura e se adaptar às equipes.
+
+A concepção utilizou Design Thinking e Diamante Duplo e incluiu:
+
+- Investigação do problema de onboarding técnico;
+- Definição da proposta de valor;
+- Modelagem da arquitetura e dos módulos da solução;
+- Prototipação conceitual no Figma.
+
+Esta etapa foi de concepção e prototipação; a implementação de software descrita abaixo foi desenvolvida independentemente.
+
+[Consultar o relatório acadêmico do DevOnboard (PDF)]({{ '/assets/documents/DevOnboard_Relat%C3%B3rio_Final.pdf' | relative_url }})
+
+## Etapa 2 · Desenvolvimento independente
+
+### DevOnboard XR — evolução técnica
+
+Adaptei a proposta original para explorar desenvolvimento de software, IA generativa e experiência imersiva. O resultado é um MVP executado localmente no Meta Quest 3 a partir de um APK, integrado a um backend e a um painel web.
+
+O desenvolvimento inclui uma API REST com Python e FastAPI, integração com Google Gemini, painel web com React e TypeScript, testes automatizados da API com Pytest e uma estratégia de fallback para resposta Mock quando o serviço externo de IA falha.
 
 ## Arquitetura técnica
 
-- **Cliente XR:** scripts em Unity verificam a saúde da API e enviam mensagens de chat usando requisições HTTP. Um gatilho da experiência pode iniciar uma mensagem para o agente.
+- **Cliente XR:** aplicação em Unity executada localmente no Meta Quest 3 por APK. Scripts verificam a saúde da API e enviam mensagens de chat por requisições HTTP; um gatilho da experiência pode iniciar uma mensagem para o agente.
 - **Backend:** a API FastAPI expõe rotas REST para health check, início e progresso do onboarding, eventos de telemetria e chat. O FastAPI também disponibiliza a documentação OpenAPI.
 - **Serviço de IA:** o módulo do agente carrega a credencial com `dotenv` e chama o Google Gemini SDK. Se a chamada ao provedor falhar, retorna uma resposta Mock.
 - **Frontend web:** o painel em React e TypeScript envia mensagens à rota de chat da API e apresenta a resposta recebida.
