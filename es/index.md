@@ -14,6 +14,7 @@ Mi experiencia incluye QA en The Boys junto a Ricardo Laganaro, investigación e
 
 ## Trabajos seleccionados
 
+- [DevOnboard XR — onboarding de desarrolladores en realidad virtual]({{ '/projetos/devonboard-xr/' | relative_url }})
 - [The Boys: Trigger Warning]({{ '/projetos/the-boys/' | relative_url }})
 - [Investigación aplicada]({{ '/projetos/pesquisa-egn/' | relative_url }})
 - [Videojuegos y emprendimiento]({{ '/projetos/startup/' | relative_url }})
@@ -23,4 +24,3 @@ Los detalles de los proyectos y el cuaderno están actualmente en portugués.
 [Conversemos en LinkedIn]({{ site.linkedin_url }})
 
 </div>
-

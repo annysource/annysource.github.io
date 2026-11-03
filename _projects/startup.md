@@ -2,7 +2,7 @@
 title: Jogos e empreendedorismo
 role: Criação & empreendedorismo
 area: Jogos autorais
-category: autoria
+category: entrepreneur
 featured: false
 order: 9
 summary: Trajetória em startups de jogos, entre projetos apoiados por fomento e jogos casuais para marcas.

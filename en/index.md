@@ -14,6 +14,7 @@ My experience includes QA on The Boys alongside Ricardo Laganaro, research at th
 
 ## Selected work
 
+- [DevOnboard XR — developer onboarding in virtual reality]({{ '/projetos/devonboard-xr/' | relative_url }})
 - [The Boys: Trigger Warning]({{ '/projetos/the-boys/' | relative_url }})
 - [Applied research]({{ '/projetos/pesquisa-egn/' | relative_url }})
 - [Games and entrepreneurship]({{ '/projetos/startup/' | relative_url }})
@@ -23,4 +24,3 @@ Project details and the notebook are currently in Portuguese.
 [Let’s connect on LinkedIn]({{ site.linkedin_url }})
 
 </div>
-

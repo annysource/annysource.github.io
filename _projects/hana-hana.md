@@ -7,9 +7,18 @@ organization: SNX.VR Hackathon · swissnex Brazil
 period: 17 e 18 de agosto de 2019
 area: VR & Experiências Interativas
 technologies: [Unity, "C#"]
-category: autoria
+category: engineer
 featured: true
 order: 7
+home_featured: true
+home_order: 5
+problem: "O desafio do hackathon propunha novas formas de interação corporal no mundo virtual HanaHana."
+contribution: "Colaborei com a equipe na criação de uma intervenção em Unity e C# que relaciona o sopro ao movimento das mãos e a uma resposta musical."
+evidence_summary: "A equipe recebeu o terceiro lugar no SNX.VR Hackathon; há registros públicos em vídeo e no repositório da equipe."
+home_context: "Unity · C# · realidade virtual · interação por sopro · colaboração em equipe"
+repository_url: "https://github.com/jordyhenry/HackathonSwissnexBrazil"
+evidence_url: "https://www.youtube.com/watch?v=92lbYq7baDE"
+evidence_label: "Registro em vídeo"
 summary: Intervenção no mundo virtual HanaHana que conecta sopro, movimento das mãos e música, criada em equipe e reconhecida com o terceiro lugar no SNX.VR Hackathon.
 youtube_id: 92lbYq7baDE
 video_title: Registro do SNX.VR Hackathon — HanaHana

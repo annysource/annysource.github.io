@@ -3,7 +3,7 @@ title: Pesquisa na Escola de Guerra Naval
 role: Pesquisadora civil
 organization: Escola de Guerra Naval
 area: Pesquisa aplicada
-category: pesquisa
+category: engineer
 featured: true
 order: 8
 summary: Experiência de pesquisa na interface entre conhecimento, tecnologia e contexto institucional.

@@ -7,7 +7,7 @@ title: "Defeso Game: ativação Frescatto"
 role: "Game Producer & Quality Assurance"
 organization: "INÁ · Agência Traços · Frescatto"
 area: "Games & Ativação de Marca"
-category: autoria
+category: entrepreneur
 featured: true
 order: 5
 summary: "Jogo desenvolvido sob encomenda para a Frescatto, conectando criação, tecnologia e sustentabilidade em uma pescaria interativa sobre o período de defeso."

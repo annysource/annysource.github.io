@@ -4,7 +4,7 @@ title: "Sushi Ninja: ativação Frescatto"
 role: "Game Producer & Quality Assurance"
 organization: "INÁ · Agência Traços · Frescatto"
 area: "Games & Ativação de Marca"
-category: autoria
+category: entrepreneur
 featured: true
 order: 6
 summary: "Jogo desenvolvido sob encomenda para a ativação da Frescatto no Taste São Paulo e Rio Gastronomia, conectando os objetivos da marca a uma experiência interativa em tela touch."

@@ -3,7 +3,7 @@ title: "Bora marcar? — agenda do grupo"
 role: "Concepção, desenvolvimento e testes"
 organization: "Projeto independente"
 area: "Engenharia de Software · Aplicação Web"
-category: autoria
+category: engineer
 featured: true
 order: 1
 home_featured: false
