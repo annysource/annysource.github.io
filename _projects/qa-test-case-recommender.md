@@ -11,6 +11,7 @@ featured: true
 order: 7
 home_featured: true
 home_order: 7
+video_previews: true
 problem: "Em jogos com desenvolvimento contínuo, selecionar manualmente os testes de regressão relevantes para cada Pull Request se torna mais trabalhoso conforme o projeto cresce."
 contribution: "Desenvolvi o recomendador, adaptei o modelo ao contexto de QA de jogos e apliquei o experimento ao GaloZica."
 evidence_summary: "Repositórios, artigo técnico, registro do workflow e gameplay do GaloZica."
@@ -90,19 +91,23 @@ O artigo do experimento registra um conjunto de 73 casos de teste. O README do r
 
 ## Vídeos e demonstrações
 
-<figure class="project-demo">
-  <video controls playsinline preload="metadata">
-    <source src="{{ '/assets/images/qa-test-recommender-01.mp4' | relative_url }}" type="video/mp4">
-    Seu navegador não oferece suporte à reprodução de vídeo.
-  </video>
+<figure class="project-demo video-preview video-preview-wide" data-video-preview data-youtube-id="h0ZzwdKC1XE" data-video-title="QA Test Case Recommender — demonstração">
+  <div class="video-preview-screen">
+    <img src="{{ '/assets/images/qa-test-case-recommender-workflow.jpg' | relative_url }}" alt="Captura do workflow do recomendador no Pull Request" loading="lazy" decoding="async">
+    <div class="video-preview-frame" data-video-frame hidden></div>
+    <button class="video-preview-play" type="button" data-video-play>Reproduzir vídeo</button>
+  </div>
+  <a class="video-preview-link" href="https://youtu.be/h0ZzwdKC1XE" target="_blank" rel="noopener noreferrer">Assistir no YouTube ↗</a>
   <figcaption>Registro de uma execução do workflow em um Pull Request do GaloZica; a captura mostra os checks concluídos.</figcaption>
 </figure>
 
-<figure class="project-demo">
-  <video controls playsinline preload="metadata" poster="{{ '/assets/images/qa-test-case-recommender-cover.jpg' | relative_url }}">
-    <source src="{{ '/assets/images/qa-test-recommender.mp4' | relative_url }}" type="video/mp4">
-    Seu navegador não oferece suporte à reprodução de vídeo.
-  </video>
+<figure class="project-demo video-preview video-preview-wide" data-video-preview data-youtube-id="LaKX6hAxobU" data-video-title="GaloZica — protótipo jogável">
+  <div class="video-preview-screen">
+    <img src="{{ '/assets/images/qa-test-case-recommender-cover.jpg' | relative_url }}" alt="Captura do GaloZica em jogo" loading="lazy" decoding="async">
+    <div class="video-preview-frame" data-video-frame hidden></div>
+    <button class="video-preview-play" type="button" data-video-play>Reproduzir vídeo</button>
+  </div>
+  <a class="video-preview-link" href="https://youtu.be/LaKX6hAxobU" target="_blank" rel="noopener noreferrer">Assistir no YouTube ↗</a>
   <figcaption>Gameplay do GaloZica, projeto usado na aplicação experimental.</figcaption>
 </figure>
 
