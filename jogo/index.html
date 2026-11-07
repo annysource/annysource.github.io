@@ -1,0 +1,628 @@
+---
+layout: null
+title: Anny Sousa · Iná
+permalink: /jogo/
+sitemap: false
+---
+<title>Anny Sousa · Iná</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Portfólio jogável de Anny Sousa: desenvolvimento de jogos em realidade virtual, engenharia de software, qualidade e IA aplicada.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Acme&family=BenchNine:wght@300;400;700&display=swap">
+<style>
+/* Layout: um único mundo isométrico em tela cheia (Three.js); HUD nos cantos; carta de fase à direita (desktop) ou gaveta inferior (celular). Direção de arte do jogo Iná. */
+:root{
+  --sky-deep:#4A0205;
+  --sky:#7A0000;
+  --ember:#C11B1B;
+  --orange:#EF7320;
+  --gold:#FFAA00;
+  --ink:#141400;
+  --peach:#F2A184;
+  --cream:#FFF4EC;
+  --lilac:#C3A8F0;
+  --card-a:#E26A3B;
+  --card-b:#B3321B;
+  --display:'Acme','Trebuchet MS',system-ui,sans-serif;
+  --body:'BenchNine','Arial Narrow','Roboto Condensed',sans-serif;
+  color-scheme:dark;
+}
+html,body{height:100%;}
+body{
+  margin:0;overflow:hidden;color:var(--cream);font-family:var(--body);
+  background:radial-gradient(120% 70% at 50% 18%, #8E0508 0%, var(--sky) 35%, var(--sky-deep) 70%), var(--sky-deep);
+}
+#scene{position:fixed;inset:0;display:block;width:100%;height:100%;touch-action:manipulation;}
+#scene canvas{display:block}
+.vignette{position:fixed;inset:0;pointer-events:none;background:linear-gradient(180deg, transparent 55%, rgba(20,20,0,.55) 100%);}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+a{color:inherit}
+
+/* HUD */
+.hud{position:fixed;z-index:5;display:flex;align-items:center;gap:14px;}
+.hud-tl{top:calc(18px + env(safe-area-inset-top,0px));left:max(18px, env(safe-area-inset-left,0px));}
+.hud-tr{top:calc(22px + env(safe-area-inset-top,0px));right:max(18px, env(safe-area-inset-right,0px));gap:22px}
+.score .n{font-family:var(--display);font-size:40px;line-height:.9;color:var(--orange);font-variant-numeric:tabular-nums}
+.score .of{font-size:18px;color:var(--peach)}
+.score small{display:block;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--peach);opacity:.85}
+.link-btn{font-weight:300;font-size:22px;letter-spacing:.02em;border-bottom:1.5px solid currentColor;padding-bottom:2px;text-decoration:none}
+.link-btn:hover{color:var(--gold)}
+.hint{position:fixed;z-index:4;left:max(18px, env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));font-size:17px;letter-spacing:.06em;color:var(--peach);opacity:.9}
+.hint kbd{font-family:var(--display);font-size:14px;border:1px solid rgba(255,244,236,.4);padding:0 6px;border-radius:3px}
+.world{position:fixed;z-index:4;left:max(18px, env(safe-area-inset-left,0px));top:calc(92px + env(safe-area-inset-top,0px));display:grid;gap:6px}
+.world button{font-size:16px;letter-spacing:.14em;text-transform:uppercase;text-align:left;color:var(--peach);opacity:.65;display:flex;align-items:center;gap:8px}
+.world button::before{content:"";width:7px;height:7px;transform:rotate(45deg);border:1.5px solid currentColor}
+.world button.on{opacity:1;color:var(--gold)}
+.world button.on::before{background:currentColor}
+.world button:hover{opacity:1}
+
+/* Carta de fase */
+.card{
+  position:fixed;z-index:6;display:flex;flex-direction:column;
+  top:calc(86px + env(safe-area-inset-top,0px));bottom:calc(24px + env(safe-area-inset-bottom,0px));
+  right:max(24px, env(safe-area-inset-right,0px));width:min(430px, 38vw);
+  background:linear-gradient(180deg,var(--card-a) 0%, #D1502A 55%, var(--card-b) 100%);
+  box-shadow:0 30px 60px -20px rgba(20,20,0,.6);border-radius:2px;
+  transition:transform .5s cubic-bezier(.2,.8,.2,1), opacity .4s;
+}
+.card[data-hidden="true"]{transform:translateX(30px);opacity:0;pointer-events:none}
+.card-scroll{flex:1;min-height:0;overflow:auto;padding:24px 28px 14px}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.pin{width:30px;height:38px;flex:none}
+.card[data-moving="true"] .pin{animation:pin 1s linear infinite}
+@keyframes pin{50%{transform:scaleX(-1)}}
+.eyebrow{font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);font-weight:700;text-align:right;text-wrap:balance}
+.cover{margin:16px 0 0;aspect-ratio:16/9;max-width:100%;overflow:hidden;background:rgba(20,20,0,.25);box-shadow:0 0 0 2px rgba(255,244,236,.85)}
+.cover img{width:100%;height:100%;object-fit:cover;display:block}
+.cover.contain img{object-fit:contain;padding:14px;box-sizing:border-box}
+.card h2{font-family:var(--display);font-weight:400;font-size:clamp(34px,3.4vw,46px);line-height:.98;margin:16px 0 0;text-transform:uppercase;text-wrap:balance}
+.card hr{border:0;border-top:1.5px solid rgba(255,244,236,.75);margin:14px 0 12px;width:82%}
+.sub{font-weight:700;font-size:20px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink);margin:0 0 12px;text-wrap:balance}
+
+.body{display:grid;gap:12px}
+.body p{font-size:20px;line-height:1.22;margin:0;max-width:36ch}
+.lead{font-size:22px!important;font-weight:400}
+.facts{display:grid;gap:12px;margin:0}
+.facts div{display:grid;gap:2px}
+.facts dt{font-weight:700;font-size:15px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink)}
+.facts dd{margin:0;font-size:20px;line-height:1.2}
+.body ul{margin:0;padding:0;list-style:none;display:grid;gap:7px}
+.body li{font-size:19px;line-height:1.18;padding-left:20px;position:relative}
+.body li::before{content:"";position:absolute;left:2px;top:.42em;width:8px;height:8px;background:var(--gold);transform:rotate(45deg)}
+.label{font-weight:700;font-size:15px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink);margin:4px 0 -4px}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tags span{font-size:16px;letter-spacing:.04em;padding:3px 9px;background:rgba(20,20,0,.22);color:var(--cream);border-radius:2px}
+.stage{font-size:17px!important;opacity:.92;border-left:3px solid var(--gold);padding-left:10px}
+.quote{font-weight:300;font-size:24px!important;line-height:1.1}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}
+.chip{display:inline-flex;align-items:center;gap:8px;font-size:18px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink);background:var(--gold);padding:7px 13px;border-radius:2px;text-decoration:none}
+.chip.ghost{background:transparent;color:var(--cream);box-shadow:inset 0 0 0 1.5px var(--cream)}
+.chip:hover{filter:brightness(1.08)}
+.small{font-size:17px!important;opacity:.9;user-select:all}
+.card-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 28px 16px;border-top:1px solid rgba(255,244,236,.25)}
+.card-nav button{font-family:var(--display);font-size:20px;letter-spacing:.02em;padding:6px 2px;white-space:nowrap}
+.card-nav button:disabled{opacity:.35;cursor:default}
+.dots{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+.dots i{width:7px;height:7px;transform:rotate(45deg);background:rgba(20,20,0,.35)}
+.dots i.lit{background:var(--gold)}
+.dots i.here{outline:1.5px solid var(--cream);outline-offset:2px}
+
+/* Splash */
+.splash{position:fixed;inset:0;z-index:10;display:grid;place-items:center;text-align:center;overflow:auto;
+  padding-block:24px;padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px));
+  background:radial-gradient(70% 60% at 50% 38%, rgba(122,0,0,.35), rgba(74,2,5,.8));transition:opacity .7s, visibility .7s}
+.splash.gone{opacity:0;visibility:hidden}
+.splash .inner{display:grid;justify-items:center;gap:14px;max-width:780px}
+.splash .mascot{width:92px;height:92px;filter:drop-shadow(0 6px 0 rgba(20,20,0,.25))}
+.splash .kicker{font-size:17px;letter-spacing:.3em;text-transform:uppercase;color:var(--peach)}
+.splash h1{font-family:var(--display);font-weight:400;margin:0;font-size:clamp(64px,13vw,146px);line-height:.86;letter-spacing:.03em;text-shadow:0 6px 0 rgba(20,20,0,.25)}
+.splash h1 span{display:inline-block;animation:rise .9s cubic-bezier(.2,.9,.2,1) both}
+.splash h1 span:nth-child(2){animation-delay:.12s}
+@keyframes rise{from{transform:translateY(24px);opacity:.2}}
+.splash .role{font-size:clamp(20px,2.6vw,26px);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);background:var(--gold);padding:4px 14px}
+.splash p{font-size:22px;line-height:1.2;margin:2px 0 4px;max-width:34ch}
+.splash .motto{font-family:var(--display);font-size:24px;color:var(--peach);letter-spacing:.04em}
+.splash .go{font-weight:300;font-size:40px;border-bottom:2px solid currentColor;line-height:1.05;margin-top:4px}
+.splash .go:hover{color:var(--gold)}
+.splash .alt{font-size:19px;color:var(--peach);border-bottom:1px solid currentColor}
+
+/* Mapa / modo leitura */
+.map{position:fixed;inset:0;z-index:20;background:rgba(40,4,6,.94);overflow:auto;
+  padding-block:calc(28px + env(safe-area-inset-top,0px)) 48px;padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px))}
+.map-in{max-width:900px;margin:0 auto}
+.map-top{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:8px}
+.map h2{font-family:var(--display);font-weight:400;font-size:44px;margin:0;letter-spacing:.03em}
+.map h3.world-h{font-family:var(--display);font-weight:400;font-size:24px;letter-spacing:.12em;color:var(--gold);margin:34px 0 0;text-transform:uppercase}
+.map article{display:grid;grid-template-columns:200px 1fr;gap:10px 26px;padding:22px 0;border-top:1px solid rgba(255,244,236,.2)}
+.map article > *{min-width:0}
+.map article .cover{margin:0;align-self:start}
+.map h4{font-family:var(--display);font-weight:400;font-size:30px;margin:0;text-transform:uppercase;line-height:1}
+.map .m-sub{font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--peach);font-size:17px;margin:4px 0 10px}
+.map .body p{max-width:62ch}
+.map .facts dt,.map .label{color:var(--peach)}
+.map .jump{font-size:18px;color:var(--gold);border-bottom:1px solid currentColor;margin-top:12px}
+.map .nocover{grid-column:1/-1}
+
+.toast{position:fixed;z-index:15;left:50%;top:calc(90px + env(safe-area-inset-top,0px));transform:translate(-50%,-10px);
+  background:var(--gold);color:var(--ink);font-weight:700;font-size:20px;letter-spacing:.06em;text-transform:uppercase;padding:10px 18px;
+  opacity:0;transition:.5s;pointer-events:none;max-width:calc(100vw - 32px);text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:760px){
+  .card{left:0;right:0;bottom:0;top:auto;width:auto;height:min(54vh,520px);border-radius:0;padding-bottom:env(safe-area-inset-bottom,0px)}
+  .card[data-hidden="true"]{transform:translateY(40px)}
+  .card-scroll{padding:16px max(18px, env(safe-area-inset-right,0px)) 8px max(18px, env(safe-area-inset-left,0px))}
+  .card-nav{padding:8px max(18px, env(safe-area-inset-right,0px)) 10px max(18px, env(safe-area-inset-left,0px))}
+  .card h2{font-size:34px}
+  .cover{aspect-ratio:21/9}
+  .hint,.world{display:none}
+  .score .n{font-size:32px}
+  .link-btn{font-size:19px}
+  .hud-tr{gap:16px}
+  .map article{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){ *{animation:none!important;transition:none!important} }
+</style>
+
+<div id="scene" aria-hidden="true"></div>
+<div class="vignette"></div>
+
+<div class="hud hud-tl" aria-live="polite">
+  <svg width="30" height="44" viewBox="0 0 30 44" aria-hidden="true"><g fill="none" stroke="#FFF4EC" stroke-width="2"><path d="M6 38V4h16v4"/><path d="M17 8h10q1 0 1 1v2H16V9q0-1 1-1z"/><path d="M6 30l-3 3v6h6v-6z"/><path d="M1 41h10"/></g><circle id="hudGlow" cx="22" cy="14" r="0" fill="#FFAA00"/></svg>
+  <div class="score"><span class="n" id="lit">0</span><span class="of" id="total">/14</span><small>postes acesos</small></div>
+</div>
+<nav class="world" id="worlds" aria-label="Mundos do mapa"></nav>
+<div class="hud hud-tr">
+  <button class="link-btn" id="openMap" type="button">mapa</button>
+  <button class="link-btn" id="reset" type="button">limpar</button>
+</div>
+<div class="hint"><kbd>←</kbd> <kbd>→</kbd> pra andar &nbsp;·&nbsp; clique numa casa pra voar até ela</div>
+
+<section class="card" id="card" data-hidden="true" aria-live="polite" aria-label="Fase atual">
+  <div class="card-scroll" id="cardScroll"></div>
+  <div class="card-nav">
+    <button type="button" id="prev">◂ voltar</button>
+    <div class="dots" id="dots" aria-hidden="true"></div>
+    <button type="button" id="next">seguir ▸</button>
+  </div>
+</section>
+
+<div class="splash" id="splash">
+  <div class="inner">
+    <img class="mascot" id="mascot" alt="" width="92" height="92">
+    <div class="kicker">Engenharia de software · Qualidade · IA aplicada</div>
+    <h1><span>ANNY</span> <span>SOUSA</span></h1>
+    <div class="role">Desenvolvedora de jogos em realidade virtual</div>
+    <p class="motto">Entender. Construir. Validar.</p>
+    <p>Leve a joaninha pelo mapa e acenda um poste em cada fase: projetos, iniciativas e trajetória.</p>
+    <button class="go" id="start" type="button">vamos lá!</button>
+    <button class="alt" id="readOnly" type="button">prefiro ler em texto</button>
+  </div>
+</div>
+
+<div class="map" id="map" hidden role="dialog" aria-modal="true" aria-labelledby="mapTitle">
+  <div class="map-in">
+    <div class="map-top"><h2 id="mapTitle">MAPA DAS FASES</h2><button class="link-btn" id="closeMap" type="button">fechar</button></div>
+    <div id="mapList"></div>
+  </div>
+</div>
+<div class="toast" id="toast">Todos os postes acesos. Iná é luz.</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+const IMG_BASE='/assets/images/jogo/';
+const SITE='https://annysousa.dev';
+const LINKEDIN='https://www.linkedin.com/in/annysousa/';
+const GITHUB='https://github.com/annysource';
+const img=n=>IMG_BASE+n+'.webp';
+
+/* Conteúdo: mesmo texto do annysousa.dev, organizado em fases */
+const FASES=[
+ {world:'Início',kind:'intro',title:'Anny Sousa',sub:'Entender. Construir. Validar.',
+  lead:'Desenvolvedora de jogos em realidade virtual, com base em engenharia de software, qualidade e IA aplicada.',
+  text:['Trabalho com games e tecnologias emergentes desde 2015, com foco em soluções confiáveis, integração de sistemas e eficiência operacional.','Qualidade é parte da engenharia: ajuda a tomar decisões melhores antes que problemas virem retrabalho.'],
+  quote:'Do sacolé em Ipanema a The Boys em realidade virtual.',
+  actions:[['Ver projetos no site',SITE+'/projetos/'],['LinkedIn',LINKEDIN,1]]},
+ {world:'Início',kind:'list',title:'O que ajudo a resolver',sub:'Como contribuo',
+  facts:[['Integrações que precisam funcionar juntas','Investigo fluxos entre interface, serviços e APIs para localizar inconsistências e apoiar uma entrega previsível.'],
+         ['Falhas difíceis de reproduzir','Organizo evidências, condições e passos para entender o comportamento e aproximar QA, desenvolvimento e produto.'],
+         ['Riscos técnicos pouco visíveis','Relaciono requisitos, uso esperado e limitações da plataforma para identificar pontos críticos antes e durante a implementação.'],
+         ['Retrabalho e esforço operacional','Ajudo a esclarecer critérios e prioridades para evitar correções tardias e concentrar o esforço no que afeta a experiência.']]},
+ {world:'Projetos',kind:'project',cover:'devonboard',title:'DevOnboard XR',area:'Engenharia de Software · IA Aplicada · XR',role:'Desenvolvimento full-stack e integração de sistemas · Projeto independente',
+  problem:'O onboarding precisava conectar uma experiência em realidade virtual, uma API, um serviço de IA generativa e um painel web.',
+  contribution:'Implementei os componentes do monorepo e suas integrações: cliente XR em Unity, API FastAPI, agente com Gemini e painel React. Quando o serviço de IA falha, um fallback devolve resposta Mock.',
+  evidence:'MVP executado localmente em APK no Meta Quest 3; o monorepo inclui testes Pytest para rotas da API.',
+  tech:['Unity','Meta Quest 3','Python','FastAPI','Google Gemini','React','TypeScript','Pytest'],
+  actions:[['Ver o case',SITE+'/projetos/devonboard-xr/'],['Repositório','https://github.com/annysource/Devonboard-XR',1]]},
+ {world:'Projetos',kind:'project',cover:'galo',title:'Galo na Casa Zero',area:'IA Generativa & Experiências Interativas',role:'XR Technologist · Quality Assurance · Accenture Brasil',
+  problem:'A experiência precisava tornar uma interação com IA generativa compreensível e coerente para o público, conectando conversa, conteúdo gerado e interface.',
+  contribution:'Colaborei na integridade dos prompts e validei retornos da API com as equipes de backend e web design; também trabalhei com arte 3D e UX.',
+  evidence:'Vídeo público da experiência; testes, métricas e código interno não estão publicados.',
+  tech:['Modelo de linguagem','API','Stable Diffusion','Avatar 3D'],
+  actions:[['Ver o case',SITE+'/projetos/galo-casa-zero/'],['Vídeo','https://www.youtube.com/watch?v=HhuxziWQs-s',1]]},
+ {world:'Projetos',kind:'project',cover:'cyhm',title:'Can You Hear Me?',area:'XR & Educação Ambiental',role:'XR Technologist · Quality Assurance · Accenture · Voice of the Oceans',
+  problem:'A experiência precisava combinar exploração em realidade virtual com interações compreensíveis e desempenho adequado no Meta Quest 2.',
+  contribution:'Implementei localização, tutorial e funcionalidades da experiência; também investiguei performance e participei das verificações de VRC.',
+  evidence:'Experiência publicada na Meta Quest Store; código e relatórios internos não são públicos.',
+  tech:['Meta Quest 2','Meta Store','VRC'],
+  actions:[['Ver o case',SITE+'/projetos/can-you-hear-me/'],['Meta Quest Store','https://www.meta.com/pt-br/experiences/can-you-hear-me/6818170608231575/',1]]},
+ {world:'Projetos',kind:'project',cover:'theboys',title:'The Boys: Trigger Warning',area:'Games & XR · PS VR2 e Meta Quest',role:'Quality Assurance · ARVORE Immersive Experience',
+  problem:'Identificar falhas de gameplay e interação em VR, ampliar a cobertura de testes e apoiar a priorização de correções.',
+  contribution:'Durante um ano, testei gameplay, analisei defeitos e riscos e criei modelos para acompanhar retestagem, reaberturas e recorrência de issues entre builds.',
+  evidence:'Modelos de análise de issues, cobertura por level e relatórios de saúde das builds no Jira e Confluence.',
+  stage:'Um ano de desenvolvimento e validação, incluindo feature freeze e testes para as lojas.',
+  tech:['Unity','C#','k6','LLMs','Prompt Tester','OVR Metrics'],
+  actions:[['Ver o case',SITE+'/projetos/the-boys/']]},
+ {world:'Projetos',kind:'project',cover:'hana',title:'HanaHana',area:'VR & Experiências Interativas · 2019',role:'Co-criação em equipe · SNX.VR Hackathon · swissnex Brazil',
+  problem:'O desafio do hackathon propunha novas formas de interação corporal no mundo virtual HanaHana.',
+  contribution:'Colaborei com a equipe na criação de uma intervenção em Unity e C# que relaciona o sopro ao movimento das mãos e a uma resposta musical.',
+  evidence:'A equipe recebeu o terceiro lugar no SNX.VR Hackathon; há registros públicos em vídeo e no repositório da equipe.',
+  tech:['Unity','C#','Realidade virtual'],
+  actions:[['Ver o case',SITE+'/projetos/hana-hana/'],['Vídeo','https://www.youtube.com/watch?v=92lbYq7baDE',1]]},
+ {world:'Projetos',kind:'project',cover:'hinos',title:'Hinos do Brasil em 360°',area:'Experiência Digital 360° · Patrimônio Cultural',role:'Fotogrametria e documentação digital · Arte de Toda Gente (Funarte)',
+  problem:'Manter acessível ao público o registro da exposição Hinos do Brasil após o encerramento da mostra presencial.',
+  contribution:'Participei da atividade de campo em Brasília, utilizando fotogrametria para a captura e documentação digital do Palácio do Planalto e da exposição.',
+  evidence:'O site público permite visitar a exposição encerrada em 360° e reúne registros tridimensionais. O trabalho também foi citado em reuniões do Mercosul.',
+  tech:['Fotogrametria','Documentação digital 3D','Visualização 360°'],
+  actions:[['Ver o case',SITE+'/projetos/arte-de-toda-gente/'],['Visitar em 360°','https://artedetodagente.com.br/hinosdobrasil/',1]]},
+ {world:'Projetos',kind:'project',cover:'qatcr',title:'QA Test Case Recommender',area:'Engenharia de Software · IA Aplicada · Game Development',role:'Projeto independente · Women Game Jam 2026',
+  problem:'Em jogos com desenvolvimento contínuo, selecionar manualmente os testes de regressão relevantes para cada Pull Request fica mais trabalhoso conforme o projeto cresce.',
+  contribution:'Desenvolvi o recomendador, adaptei o modelo ao contexto de QA de jogos e apliquei o experimento ao GaloZica.',
+  evidence:'Repositórios, artigo técnico, registro do workflow e gameplay do GaloZica.',
+  stage:'Protótipo funcional e experimento aplicado; não apresentado como solução de produção.',
+  tech:['TensorFlow.js','JavaScript','Node.js','GitHub Actions','Unity e C#'],
+  actions:[['Ver o case',SITE+'/projetos/qa-test-case-recommender/'],['Repositório','https://github.com/annysource/neural-qa-test-recommender',1]]},
+ {world:'Iniciativas',kind:'venture',cover:'sushi',title:'Inaluz Cria',sub:'Fundadora · Aqui, sua história ganha jogo',
+  text:['Transformamos histórias de marcas e lugares em jogos e experiências interativas que convidam o público a participar. Antes, Iná Game Studio, de onde vem a direção de arte deste mapa.'],
+  label:'Minha atuação',
+  list:['Alinhamento de objetivos, requisitos e escopo com clientes e agências','Coordenação de profissionais e acompanhamento da produção','Documentação de decisões criativas e técnicas','Planejamento e execução de QA'],
+  label2:'Trajetória',
+  list2:['Ativações para L’Oréal, CeraVe e Frescatto (Sushi Ninja e Defeso Game)','Uaná Etê Game Turístico e apoio do Programa Startup Rio','Salvaguarda Digital com o Instituto Brasileiro de Direitos Culturais','Projeto cultural para Niterói, no O Globo (2021)'],
+  actions:[['Conhecer a Inaluz Cria',SITE+'/inaluzcria/']]},
+ {world:'Iniciativas',kind:'venture',cover:'hub',title:'QA Game HUB',sub:'Fundadora · uma iniciativa da Inaluz Cria',
+  text:['Garantia de qualidade e testes alinhados ao momento e às necessidades de cada jogo independente, com escopo definido para cada projeto.','Testes organizados ajudam a localizar falhas de progressão, regressões e problemas de usabilidade enquanto o jogo ainda está em desenvolvimento.'],
+  label:'Formas de trabalho',
+  list:['Testathons: rodadas em grupo com vários QAs','QA sob demanda','Acompanhamento durante o desenvolvimento','Formação em QA para games'],
+  actions:[['Conhecer o QA Game HUB',SITE+'/qa-game-hub/']]},
+ {world:'Iniciativas',kind:'venture',title:'Game Creators Vale do Café',sub:'Idealizadora · comunidade',
+  text:['Quem faz jogos na região precisa se conectar. Um espaço para aproximar pessoas que criam jogos no Vale do Café e no Sul Fluminense, trocar experiências e fortalecer a cena regional.'],
+  label:'O que queremos construir juntos',
+  list:['Conexões e colaboração','Visibilidade para os jogos da região','Conhecimento e oportunidades','Um ecossistema regional mais forte'],
+  label2:'Também participo de',
+  list2:['Cinema Nosso','Women Game Jam','Mentorias Games Brasil','Rede Cidadã'],
+  actions:[['Conhecer a comunidade',SITE+'/game-creators/']]},
+ {world:'Trajetória',kind:'venture',cover:'portrait',coverCap:'Accenture | Porto Digital',title:'Software, QA e experiências interativas',sub:'Trajetória e formação',
+  text:['Atuei como contratada em projetos ligados à Accenture, ARVORE, Kokku e Gazeus. Em equipes multidisciplinares, trabalhei com desenvolvimento de funcionalidades, investigação de falhas, validação de integrações e qualidade em games, XR e aplicações com IA.'],
+  label:'Formação',
+  list:['Tecnologia em Jogos Digitais','Pesquisadora civil na Escola de Guerra Naval, com artigo publicado','MBA em Engenharia de Software · UFRJ','MBA em Engenharia de Software com IA Aplicada · UNIPDS','MBA em Engenharia DevOps · Faculdade Focus'],
+  label2:'Interesses técnicos',
+  tags:['Backend, APIs e integração','IA aplicada e validação de LLMs','Arquitetura de software','Observabilidade e desempenho','Automação de testes']},
+ {world:'Contato',kind:'contact',title:'Próxima fase',sub:'Rio de Janeiro · aberta a contratos híbridos',
+  text:['Estou aberta a oportunidades em desenvolvimento de jogos em realidade virtual, engenharia de software e aplicações com IA.','Para conhecer meu trabalho ou conversar sobre uma oportunidade:'],
+  actions:[['LinkedIn',LINKEDIN],['GitHub',GITHUB,1],['Todos os projetos',SITE+'/projetos/',1],['Caderno',SITE+'/caderno/',1]],
+  copy:true}
+];
+const N=FASES.length;
+const WORLDS=[...new Set(FASES.map(f=>f.world))];
+const $=id=>document.getElementById(id);
+const card=$('card'), splash=$('splash'), map=$('map');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+$('mascot').src=img('joaninha'); $('total').textContent='/'+N;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function bodyHTML(f){
+  let h='';
+  if(f.lead) h+=`<p class="lead">${esc(f.lead)}</p>`;
+  (f.text||[]).forEach(t=>h+=`<p>${esc(t)}</p>`);
+  if(f.kind==='project'){
+    h+=`<dl class="facts"><div><dt>Problema</dt><dd>${esc(f.problem)}</dd></div><div><dt>Contribuição</dt><dd>${esc(f.contribution)}</dd></div><div><dt>Evidência</dt><dd>${esc(f.evidence)}</dd></div></dl>`;
+    if(f.stage) h+=`<p class="stage">${esc(f.stage)}</p>`;
+  }
+  if(f.facts) h+=`<dl class="facts">${f.facts.map(([a,b])=>`<div><dt>${esc(a)}</dt><dd>${esc(b)}</dd></div>`).join('')}</dl>`;
+  if(f.label) h+=`<p class="label">${esc(f.label)}</p>`;
+  if(f.list) h+=`<ul>${f.list.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
+  if(f.label2) h+=`<p class="label">${esc(f.label2)}</p>`;
+  if(f.list2) h+=`<ul>${f.list2.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
+  const tags=f.tech||f.tags; if(tags) h+=`<div class="tags">${tags.map(t=>`<span>${esc(t)}</span>`).join('')}</div>`;
+  if(f.quote) h+=`<p class="quote">${esc(f.quote)}</p>`;
+  if(f.actions) h+=`<div class="actions">${f.actions.map(([l,u,g])=>`<a class="chip${g?' ghost':''}" href="${u}" target="_blank" rel="noopener">${esc(l)} ↗</a>`).join('')}${f.copy?`<button type="button" class="chip ghost" data-copy="${LINKEDIN}">copiar LinkedIn</button>`:''}</div>`;
+  if(f.copy) h+=`<p class="small">linkedin.com/in/annysousa</p>`;
+  return `<div class="body">${h}</div>`;
+}
+const subOf=f=>f.role||f.sub||'';
+const eyeOf=(f,i)=>`${f.world}${f.area?' · '+f.area:''}`;
+const coverHTML=f=>f.cover?`<figure class="cover"><img src="${img(f.cover)}" alt="${esc(f.coverCap||'Imagem do projeto '+f.title)}" loading="lazy"></figure>`:'';
+
+/* ---------- UI ---------- */
+let shown=0, started=false;
+const lit=new Set();
+const dots=$('dots');
+for(let i=0;i<N;i++) dots.appendChild(document.createElement('i'));
+$('worlds').innerHTML=WORLDS.map(w=>`<button type="button" data-world="${w}">${w}</button>`).join('');
+function render(i){
+  const f=FASES[i]; shown=i;
+  $('cardScroll').innerHTML=`<div class="card-head"><svg class="pin" viewBox="0 0 40 50" aria-hidden="true"><path d="M12 0h8v50L0 15z" fill="#C11B1B"/><path d="M20 0h8l12 15-20 35z" fill="#EF7320"/><path d="M20 10a6.5 6.5 0 0 1 0 13z" fill="#C11B1B"/></svg><div class="eyebrow">${esc(eyeOf(f,i))}</div></div>${coverHTML(f)}<h2>${esc(f.title)}</h2><hr><p class="sub">${esc(subOf(f))}</p>${bodyHTML(f)}`;
+  $('cardScroll').scrollTop=0;
+  $('prev').disabled=i===0; $('next').disabled=i===N-1;
+  [...$('worlds').children].forEach(b=>b.classList.toggle('on',b.dataset.world===f.world));
+  updateDots();
+}
+function updateDots(){ [...dots.children].forEach((d,k)=>{d.classList.toggle('lit',lit.has(k));d.classList.toggle('here',k===shown);}); }
+function updateScore(){ $('lit').textContent=lit.size; $('hudGlow').setAttribute('r', lit.size?4:0); updateDots(); }
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-copy]'); if(!b) return;
+  const t=b.dataset.copy, label=b.textContent;
+  const ok=()=>{b.textContent='link copiado';setTimeout(()=>b.textContent=label,1800)};
+  try{ navigator.clipboard.writeText(t).then(ok,()=>{b.textContent=t}); }catch(_){ b.textContent=t; }
+});
+$('worlds').addEventListener('click',e=>{ const b=e.target.closest('[data-world]'); if(b) goTo(FASES.findIndex(f=>f.world===b.dataset.world)); });
+$('mapList').innerHTML=WORLDS.map(w=>`<h3 class="world-h">${w}</h3>`+FASES.map((f,i)=>f.world!==w?'':`<article>${f.cover?coverHTML(f):''}<div class="${f.cover?'':'nocover'}"><h4>${esc(f.title)}</h4><div class="m-sub">${esc(subOf(f))}</div>${bodyHTML(f)}<button class="jump" type="button" data-jump="${i}">levar a joaninha até aqui</button></div></article>`).join('')).join('');
+function openMap(){ map.hidden=false; $('closeMap').focus(); }
+function closeMap(){ map.hidden=true; }
+$('openMap').onclick=openMap; $('closeMap').onclick=closeMap;
+$('readOnly').onclick=()=>{ begin(); openMap(); };
+map.addEventListener('click',e=>{ const j=e.target.closest('[data-jump]'); if(j){ closeMap(); goTo(+j.dataset.jump); } });
+$('prev').onclick=()=>goTo(shown-1); $('next').onclick=()=>goTo(shown+1);
+$('reset').onclick=()=>{ lit.clear(); lamps.forEach(l=>l&&l.off()); allDone=false; updateScore(); goTo(0,true); };
+addEventListener('keydown',e=>{
+  if(e.key==='Escape' && !map.hidden){ closeMap(); return; }
+  if(!map.hidden) return;
+  if(e.target.closest && e.target.closest('a,button') && (e.key==='Enter'||e.key===' ')) return;
+  if(e.key==='ArrowRight'||e.key==='d'||e.key==='D'){ goTo(shown+1); }
+  if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A'){ goTo(shown-1); }
+});
+function begin(){ if(started) return; started=true; splash.classList.add('gone'); card.dataset.hidden='false'; render(shown); layout(); light(0); }
+$('start').onclick=begin;
+render(0);
+
+/* ---------- Mundo ---------- */
+const lamps=[]; let allDone=false;
+if(typeof THREE==='undefined'){ // sem WebGL ou CDN: modo leitura
+  var goTo=(i)=>{ if(!started) begin(); if(i>=0&&i<N) render(i); };
+  var layout=()=>{}; var light=(i)=>{lit.add(i);updateScore();};
+  $('start').onclick=()=>{ begin(); openMap(); };
+  return;
+}
+const host=$('scene');
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+host.appendChild(renderer.domElement);
+const scene=new THREE.Scene();
+const camera=new THREE.OrthographicCamera(-1,1,1,-1,0.1,300);
+const DIR=new THREE.Vector3(1,0.92,1).normalize();
+
+const PAL={ // ordem: +x, -x, +y(topo), -y, +z, -z
+  stone:[0x5B2A5D,0x5B2A5D,0xEE8E70,0x22101a,0xA4494F,0xA4494F],
+  beam:[0x6A2C5E,0x6A2C5E,0xF39C7E,0x22101a,0xB65459,0xB65459],
+  house:[0x4B2249,0x4B2249,0xF5A286,0x22101a,0xC4665F,0xC4665F],
+  house2:[0x3E1C3E,0x3E1C3E,0xE68367,0x22101a,0x9B4048,0x9B4048],
+  ground:[0x3A1A45,0x3A1A45,0x8C2622,0x140a10,0x934049,0x934049],
+  tall:[0x4A2050,0x4A2050,0xE48B6F,0x140a10,0xA0474F,0xA0474F],
+  tallLit:[0x5E2A5E,0x5E2A5E,0xF6A086,0x140a10,0xD77A6A,0xD77A6A],
+  win:[0x1E0D18,0x1E0D18,0x1E0D18,0x1E0D18,0x1E0D18,0x1E0D18],
+  winLit:[0xFFC15A,0xFFC15A,0xFFC15A,0xFFC15A,0xFFC15A,0xFFC15A],
+  cap:[0x8D8AA0,0x8D8AA0,0xC9C6D8,0x555555,0xA9A6BC,0xA9A6BC],
+  pole:[0x2A1626,0x2A1626,0x3A2034,0x111111,0x4A2A40,0x4A2A40],
+  lampOff:[0x3B2A30,0x3B2A30,0x50383F,0x2a1d22,0x46323A,0x46323A],
+  lampOn:[0xFFB43A,0xFFB43A,0xFFE2A0,0xFFF1C8,0xFFC560,0xFFC560],
+  sand:[0x7A3A42,0x7A3A42,0xF4B47E,0x22101a,0xC97B5E,0xC97B5E],
+  lilac:[0x4A2F6A,0x4A2F6A,0xC6A9EE,0x22101a,0x8E6CBF,0x8E6CBF]
+};
+const matCache={};
+const mats=p=>matCache[p]||(matCache[p]=PAL[p].map(c=>new THREE.MeshBasicMaterial({color:c})));
+const BOX=new THREE.BoxGeometry(1,1,1);
+const pickables=[];
+function blk(w,h,d,x,y,z,p='stone',st){ const m=new THREE.Mesh(BOX,mats(p)); m.scale.set(w,h,d); m.position.set(x,y,z); scene.add(m); if(st!==undefined){m.userData.st=st;pickables.push(m);} return m; }
+function glowTex(){ const c=document.createElement('canvas'); c.width=c.height=128; const g=c.getContext('2d');
+  const gr=g.createRadialGradient(64,64,0,64,64,64); gr.addColorStop(0,'rgba(255,226,160,1)'); gr.addColorStop(.22,'rgba(255,170,0,.6)'); gr.addColorStop(.6,'rgba(239,115,32,.18)'); gr.addColorStop(1,'rgba(239,115,32,0)');
+  g.fillStyle=gr; g.fillRect(0,0,128,128); return new THREE.CanvasTexture(c); }
+const GLOW=glowTex();
+
+const HGT=[0,1.2,2.6,1.6,3.2,4.6,3.6,5.2,6.6,5.4,6.8,8.2,7.2,8.8];
+const SP=7, BASE=-1.5;
+const ST=FASES.map((f,i)=>new THREE.Vector3(i*SP,HGT[i%HGT.length],[0,-5,0,5][i%4]));
+const platPal=i=>({Início:'sand',Projetos:'stone',Iniciativas:'lilac',Trajetória:'stone',Contato:'sand'}[FASES[i].world]||'stone');
+
+blk(SP*(N-1)+16,8,30, SP*(N-1)/2, BASE-4, 0,'ground');
+const rnd=(()=>{let s=7;return()=>(s=(s*16807)%2147483647)/2147483647;})();
+for(let i=-1;i<=N;i++){
+  const h=4+rnd()*7, x=i*SP+rnd()*3;
+  blk(2.2+rnd()*1.6,h,2.2, x, BASE+h/2, -15-rnd()*3,'tall');
+  if(rnd()>.55){ const h2=2+rnd()*3; blk(1.8,h2,1.8, x+3.4, BASE+h2/2, -10,'house2'); }
+}
+for(let k=0;k<3;k++){ const h=3+rnd()*5; blk(2.2,h,2.6, -7, BASE+h/2, -9+k*5,'tall'); }
+const CX=SP*(N-1)-2, CZ=-14;
+blk(2.2,18,2.2, CX, BASE+9, CZ,'tallLit'); blk(7,2.2,2.2, CX, BASE+13.5, CZ,'tallLit');
+
+const stair=(x,z0,z1,y0,y1)=>{ const sg=Math.sign(z1-z0), L=Math.abs(z1-z0), dy=y1-y0;
+  const n=Math.max(5,Math.round(Math.abs(dy)/0.22)), sd=L/n, rise=Math.abs(dy)/n;
+  for(let k=0;k<n;k++){ const top= dy>0 ? y0+dy*(k+1)/n : y0+dy*k/n; const hh=0.3+rise*1.2;
+    blk(0.8,hh,sd+0.01, x, top-hh/2, z0+sg*(k+0.5)*sd,'beam'); } };
+const route=[], stIdx=[];
+const push=v=>{ const l=route[route.length-1]; if(!l||l.distanceTo(v)>0.01) route.push(v.clone()); };
+push(ST[0]); stIdx[0]=0;
+for(let i=0;i<N-1;i++){
+  const A=ST[i], B=ST[i+1], sg=Math.sign(B.z-A.z);
+  const xs=A.x+1.5, xe=B.x+0.4;
+  blk(xe-xs,0.3,0.8,(xs+xe)/2, A.y-0.15, A.z,'beam');
+  const colH=A.y-0.3-BASE; if(colH>0.2) blk(0.5,colH,0.5,B.x,BASE+colH/2,A.z,'beam');
+  blk(0.5,0.06,0.5,xs+0.25,A.y+0.03,A.z,'cap'); blk(0.5,0.06,0.5,B.x,A.y+0.03,A.z,'cap');
+  const zs=A.z+sg*0.4, ze=B.z-sg*1.5;
+  stair(B.x,zs,ze,A.y,B.y);
+  push(new THREE.Vector3(B.x,A.y,A.z)); push(new THREE.Vector3(B.x,A.y,zs)); push(new THREE.Vector3(B.x,B.y,ze)); push(B);
+  stIdx[i+1]=route.length-1;
+}
+ST.forEach((p,i)=>{
+  const h=p.y-BASE;
+  blk(3,h,3,p.x,BASE+h/2,p.z, platPal(i), i);
+  [[-1.3,-1.3],[1.3,-1.3],[1.3,1.3],[-1.3,1.3]].forEach(([a,b])=>blk(0.4,0.06,0.4,p.x+a,p.y+0.03,p.z+b,'cap'));
+  const hx=p.x-1, hz=p.z-1, hs=1.15;
+  blk(hs,hs,hs,hx,p.y+hs/2,hz,'house',i);
+  const wins=[blk(0.2,0.28,0.04,hx-0.24,p.y+0.78,hz+hs/2+0.02,'win'), blk(0.2,0.28,0.04,hx+0.24,p.y+0.78,hz+hs/2+0.02,'win'), blk(0.04,0.28,0.2,hx+hs/2+0.02,p.y+0.78,hz-0.25,'win')];
+  blk(0.04,0.5,0.24,hx+hs/2+0.02,p.y+0.25,hz+0.22,'win');
+  if(i%3!==1){ blk(0.9,0.8,0.9,hx-0.1,p.y+hs+0.4,hz-0.1,'house2',i); wins.push(blk(0.18,0.24,0.04,hx,p.y+hs+0.5,hz+0.37,'win')); }
+  const px=p.x+1.15, pz=p.z-1.15;
+  blk(0.28,0.14,0.28,px,p.y+0.07,pz,'pole'); blk(0.1,1.9,0.1,px,p.y+0.95,pz,'pole',i);
+  blk(0.6,0.07,0.07,px-0.27,p.y+1.9,pz,'pole');
+  const head=blk(0.32,0.12,0.24,px-0.52,p.y+1.82,pz,'lampOff',i);
+  const spr=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true}));
+  spr.position.set(px-0.52,p.y+1.7,pz); spr.scale.set(0.01,0.01,1); scene.add(spr);
+  const pool=new THREE.Mesh(new THREE.CircleGeometry(1.5,28),new THREE.MeshBasicMaterial({map:GLOW,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false,opacity:0}));
+  pool.rotation.x=-Math.PI/2; pool.position.set(p.x+0.4,p.y+0.015,p.z-0.4); scene.add(pool);
+  lamps[i]={k:0,goal:0,
+    on(){ this.goal=1; head.material=mats('lampOn'); wins.forEach(w=>w.material=mats('winLit')); },
+    off(){ this.goal=0; head.material=mats('lampOff'); wins.forEach(w=>w.material=mats('win')); },
+    tick(dt){ this.k+=(this.goal-this.k)*Math.min(1,dt*(reduce?60:4)); const s=0.01+this.k*2.6*(1+Math.sin(perf*2.2+i)*0.04); spr.scale.set(s,s,1); pool.material.opacity=this.k*0.75; }};
+});
+
+// Iná flutua na fase da Inaluz Cria
+const INA_AT=Math.max(0,FASES.findIndex(f=>f.title==='Inaluz Cria'));
+const ina=new THREE.Group();{
+  const m=new THREE.MeshLambertMaterial({color:0xC9C3FF,emissive:0x2B3AA8,emissiveIntensity:.35,flatShading:true});
+  const body=new THREE.Mesh(new THREE.IcosahedronGeometry(0.34,0),m); body.scale.set(1,1.25,1); ina.add(body);
+  const neck=new THREE.Mesh(new THREE.CylinderGeometry(.05,.07,.14,6),m); neck.position.y=.47; ina.add(neck);
+  const headI=new THREE.Mesh(new THREE.SphereGeometry(.17,8,6),m); headI.position.y=.66; ina.add(headI);
+  const hood=new THREE.Mesh(new THREE.ConeGeometry(.2,.62,5),m); hood.position.set(-.06,.86,-.08); hood.rotation.z=.25; ina.add(hood);
+  [[.32,0,0,-1.1],[-.32,0,0,1.1],[.15,-.4,.1,-2.6],[-.15,-.4,-.1,2.6]].forEach(([x,y,z,r])=>{const s=new THREE.Mesh(new THREE.ConeGeometry(.07,.32,4),m);s.position.set(x,y,z);s.rotation.z=r;ina.add(s);});
+  const halo=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false,opacity:.6})); halo.scale.set(2.2,2.2,1); halo.position.y=.2; ina.add(halo);
+  ina.position.set(ST[INA_AT].x-1.05,ST[INA_AT].y+2.15,ST[INA_AT].z+1.0); ina.scale.setScalar(.9); scene.add(ina);
+}
+{ const g=new THREE.BufferGeometry(), a=[]; for(let i=0;i<460;i++) a.push(-30+rnd()*(SP*N+40), 6+rnd()*50, -60+rnd()*60);
+  g.setAttribute('position',new THREE.Float32BufferAttribute(a,3));
+  var stars=new THREE.Points(g,new THREE.PointsMaterial({color:0xFFF4EC,size:2.2,sizeAttenuation:false,transparent:true,opacity:.75})); scene.add(stars); }
+scene.add(new THREE.HemisphereLight(0xFFE8DA,0x4A1A28,1.05));
+const sun=new THREE.DirectionalLight(0xFFF2E6,0.7); sun.position.set(4,10,6); scene.add(sun);
+
+/* ---------- Joaninha (mascote: casco creme, pintas pretas e verde, fone lilás) ---------- */
+const bug=new THREE.Group(); bug.rotation.order='YXZ';
+const halves=[], wings=[], legs=[], ants=[];
+{
+  const L=(c,o={})=>new THREE.MeshLambertMaterial(Object.assign({color:c,flatShading:true},o));
+  const cream=L(0xFBF3E4,{emissive:0x2a2018,side:THREE.DoubleSide});
+  const ink=L(0x15130F);
+  const green=L(0xB3C98A,{emissive:0x1a2410});
+  const lilac=L(0xB89BE6,{emissive:0x241a3a});
+  const outline=new THREE.MeshBasicMaterial({color:0x0E0D0B,side:THREE.BackSide});
+  const under=new THREE.Mesh(new THREE.SphereGeometry(.31,10,6),ink); under.scale.set(1,.5,1.18); under.position.y=.14; bug.add(under);
+  [-1,1].forEach(s=>{
+    const pivot=new THREE.Group(); pivot.position.y=.13; bug.add(pivot);
+    const shell=new THREE.Group(); shell.scale.set(1,.8,1.18); pivot.add(shell);
+    const geo=new THREE.SphereGeometry(.32,12,7,s>0?Math.PI/2:-Math.PI/2,Math.PI,0,Math.PI/2);
+    shell.add(new THREE.Mesh(geo,cream));
+    const ol=new THREE.Mesh(geo,outline); ol.scale.setScalar(1.07); shell.add(ol);
+    const c=s>0?Math.PI:0;
+    const spots=s<0 ? [[.75,c+.5,.1,green],[1.05,c-.35,.07,ink],[1.25,c+.15,.05,ink]] : [[.62,c-.55,.06,ink],[.95,c+.3,.085,ink],[1.25,c-.15,.05,ink]];
+    spots.forEach(([th,ph,r,m])=>{
+      const n=new THREE.Vector3(-Math.cos(ph)*Math.sin(th),Math.cos(th),Math.sin(ph)*Math.sin(th));
+      const d=new THREE.Mesh(new THREE.SphereGeometry(r,9,6),m); d.scale.set(1,1,.3);
+      d.position.copy(n).multiplyScalar(.318); d.lookAt(n.clone().multiplyScalar(2)); shell.add(d);
+      if(m===green){ const ring=new THREE.Mesh(new THREE.SphereGeometry(r*1.18,9,6),ink); ring.scale.set(1,1,.25); ring.position.copy(n).multiplyScalar(.312); ring.lookAt(n.clone().multiplyScalar(2)); shell.add(ring); }
+    });
+    halves.push({pivot,s});
+    const wg=new THREE.Mesh(new THREE.CircleGeometry(.36,12),new THREE.MeshBasicMaterial({color:0xE6DAFF,transparent:true,opacity:.45,side:THREE.DoubleSide,depthWrite:false}));
+    wg.scale.set(.55,1,1); wg.rotation.x=-Math.PI/2; const wp=new THREE.Group(); wp.position.set(s*.08,.28,-.05); wg.position.set(s*.2,0,-.18); wp.add(wg); wp.visible=false; bug.add(wp); wings.push({wp,s});
+  });
+  // cabeça
+  const hg=new THREE.SphereGeometry(.16,10,7);
+  const head=new THREE.Mesh(hg,ink); head.scale.set(1.25,.85,.95); head.position.set(0,.15,.36); bug.add(head);
+  // fone: arco creme com faixa lilás e conchas lilás/verde
+  const band=new THREE.Mesh(new THREE.TorusGeometry(.2,.035,6,14,Math.PI),cream); band.position.set(0,.17,.37); bug.add(band);
+  const strip=new THREE.Mesh(new THREE.TorusGeometry(.2,.022,5,10,Math.PI*.5),lilac); strip.position.set(0,.18,.39); strip.rotation.z=Math.PI*.25; bug.add(strip);
+  [-1,1].forEach(s=>{
+    const cup=new THREE.Mesh(new THREE.CylinderGeometry(.075,.075,.06,10),lilac); cup.rotation.z=Math.PI/2; cup.position.set(s*.205,.17,.37); bug.add(cup);
+    const pad=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,.03,10),green); pad.rotation.z=Math.PI/2; pad.position.set(s*.25,.17,.37); bug.add(pad);
+    const ap=new THREE.Group(); ap.position.set(s*.07,.24,.42); bug.add(ap);
+    const a=new THREE.Mesh(new THREE.CylinderGeometry(.012,.012,.26,4),ink); a.position.y=.12; ap.add(a);
+    const t=new THREE.Mesh(new THREE.SphereGeometry(.035,6,4),ink); t.position.y=.25; ap.add(t);
+    ap.rotation.set(.55,0,-s*.5); ants.push({ap,s});
+    [-.14,0,.14].forEach((z,k)=>{ const lp=new THREE.Group(); lp.position.set(s*.2,.09,z); bug.add(lp);
+      const l=new THREE.Mesh(new THREE.CylinderGeometry(.016,.016,.22,4),ink); l.position.set(s*.08,-.04,0); l.rotation.z=s*1.0; lp.add(l);
+      const f=new THREE.Mesh(new THREE.SphereGeometry(.028,5,4),ink); f.position.set(s*.17,-.09,0); lp.add(f);
+      legs.push({lp,ph:k*2.1+(s>0?Math.PI:0)}); });
+  });
+  bug.scale.setScalar(1.75);
+  const aura=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false,opacity:.3})); aura.scale.set(1.4,1.4,1); aura.position.y=.25; bug.add(aura);
+}
+bug.position.copy(ST[0]); bug.rotation.y=Math.PI/2; scene.add(bug);
+
+/* ---------- Movimento ---------- */
+let cur=0, mv=null, yawT=Math.PI/2, pitchT=0, open=0, walking=0;
+const camT=ST[0].clone();
+function light(i){ if(lit.has(i)) return; lit.add(i); lamps[i].on(); updateScore();
+  if(lit.size===N && !allDone){ allDone=true; const t=$('toast'); t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),3200); } }
+function goTo(j,instant){
+  j=Math.max(0,Math.min(N-1,j)); if(!started) begin();
+  render(j);
+  if(j===cur && !mv) return;
+  card.dataset.moving='true';
+  if(reduce||instant){ mv=null; bug.position.copy(ST[j]); arrive(j); return; }
+  if(mv || Math.abs(j-cur)>1){
+    const a=bug.position.clone(), b=ST[j].clone(), d=a.distanceTo(b);
+    mv={mode:'fly',a,b,t:0,dur:Math.min(2.4,0.9+d*0.03),arc:1.6+d*0.05,to:j};
+  } else {
+    const i0=stIdx[cur], i1=stIdx[j], step=i1>i0?1:-1, pts=[];
+    for(let k=i0;k!==i1+step;k+=step) pts.push(route[k]);
+    const cum=[0]; for(let k=1;k<pts.length;k++) cum.push(cum[k-1]+pts[k].distanceTo(pts[k-1]));
+    mv={mode:'walk',pts,cum,s:0,to:j};
+  }
+}
+function arrive(j){ cur=j; light(j); card.dataset.moving='false'; }
+
+let perf=0, last=performance.now();
+function tick(now){
+  const dt=Math.min(0.05,(now-last)/1000); last=now; perf+=dt; walking=0;
+  if(mv){
+    if(mv.mode==='walk'){
+      mv.s+=dt*6.4; const tot=mv.cum[mv.cum.length-1];
+      if(mv.s>=tot){ bug.position.copy(mv.pts[mv.pts.length-1]); const j=mv.to; mv=null; arrive(j); }
+      else{ let k=0; while(mv.cum[k+1]<mv.s) k++;
+        const a=mv.pts[k], b=mv.pts[k+1], f=(mv.s-mv.cum[k])/(mv.cum[k+1]-mv.cum[k]);
+        bug.position.lerpVectors(a,b,f);
+        const dx=b.x-a.x, dz=b.z-a.z, h=Math.hypot(dx,dz);
+        if(h>0.01){ yawT=Math.atan2(dx,dz); pitchT=-Math.atan2(b.y-a.y,h)*0.8; }
+        walking=1; }
+    } else {
+      mv.t+=dt/mv.dur; const t=Math.min(1,mv.t), e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+      bug.position.lerpVectors(mv.a,mv.b,e); bug.position.y+=Math.sin(Math.PI*e)*mv.arc;
+      const dx=mv.b.x-mv.a.x, dz=mv.b.z-mv.a.z; if(Math.hypot(dx,dz)>.01) yawT=Math.atan2(dx,dz); pitchT=-0.25*Math.cos(Math.PI*e);
+      if(mv.t>=1){ const j=mv.to; mv=null; arrive(j); }
+    }
+  } else pitchT=0;
+  const flying=mv&&mv.mode==='fly';
+  let dy=yawT-bug.rotation.y; dy=Math.atan2(Math.sin(dy),Math.cos(dy)); bug.rotation.y+=dy*Math.min(1,dt*10);
+  bug.rotation.x+=(pitchT-bug.rotation.x)*Math.min(1,dt*8);
+  open+=((flying?1:0)-open)*Math.min(1,dt*8);
+  halves.forEach(({pivot,s})=>{ pivot.rotation.z=s*0.95*open; pivot.rotation.x=-0.35*open; });
+  wings.forEach(({wp,s})=>{ wp.visible=open>.15; wp.rotation.z=s*(0.3+Math.sin(perf*42)*0.7)*open; });
+  legs.forEach(({lp,ph})=>{ lp.rotation.x=walking?Math.sin(perf*20+ph)*0.6:lp.rotation.x*0.85; });
+  ants.forEach(({ap,s})=>{ ap.rotation.z=-s*(0.5+Math.sin(perf*3+s)*0.08); });
+  if(!mv) bug.position.y=ST[cur].y+Math.abs(Math.sin(perf*2))*0.02;
+  ina.position.y=ST[INA_AT].y+2.15+Math.sin(perf*1.6)*0.12; ina.rotation.y+=dt*0.5;
+  lamps.forEach(l=>l.tick(dt));
+  stars.material.opacity=.6+Math.sin(perf*1.3)*.15;
+  const goal=bug.position.clone(); goal.y+=0.4;
+  camT.lerp(goal,1-Math.exp(-dt*3.2));
+  camera.position.copy(camT).addScaledVector(DIR,60); camera.lookAt(camT);
+  renderer.render(scene,camera);
+  requestAnimationFrame(tick);
+}
+function layout(){
+  const W=innerWidth, H=innerHeight; renderer.setSize(W,H,false);
+  renderer.domElement.style.width=W+'px'; renderer.domElement.style.height=H+'px';
+  const mobile=W<=760, viewH=mobile?17:15, u=viewH/H;
+  let cx=W/2, cy=H/2;
+  if(started){ if(mobile) cy=(H-card.offsetHeight)/2+34; else cx=(W-card.offsetWidth-40)/2; }
+  camera.left=-cx*u; camera.right=(W-cx)*u; camera.top=cy*u; camera.bottom=-(H-cy)*u; camera.updateProjectionMatrix();
+}
+addEventListener('resize',layout);
+const ray=new THREE.Raycaster(), mp=new THREE.Vector2();
+function pick(e){ const r=renderer.domElement.getBoundingClientRect(); mp.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);
+  ray.setFromCamera(mp,camera); const h=ray.intersectObjects(pickables,false)[0]; return h?h.object.userData.st:undefined; }
+renderer.domElement.addEventListener('click',e=>{ if(!started) return; const st=pick(e); if(st!==undefined) goTo(st); });
+renderer.domElement.addEventListener('pointermove',e=>{ if(e.pointerType!=='mouse') return; renderer.domElement.style.cursor=(started&&pick(e)!==undefined)?'pointer':'default'; });
+layout(); requestAnimationFrame(tick);
+})();
+</script>
