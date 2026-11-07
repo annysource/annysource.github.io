@@ -20,8 +20,22 @@ description: "Serviços de QA para jogos independentes: testathons, QA sob deman
       </div>
     </div>
     <aside class="qa-sales-aside">
-      <div class="qa-sales-mascot">
-        <img src="{{ '/assets/images/joaninha.png' | relative_url }}" alt="" width="280" height="280">
+      <div class="qa-hunt" data-qa-hunt data-whatsapp="{{ site.qa_game_hub_whatsapp_url | escape }}">
+        <div class="qa-sales-mascot">
+          <img class="qa-hunt-fallback" src="{{ '/assets/images/joaninha.png' | relative_url }}" alt="Joaninha mascote do QA Game HUB usando headset" width="280" height="280">
+          <canvas class="qa-hunt-canvas" aria-hidden="true"></canvas>
+        </div>
+        <div class="qa-hunt-panel" hidden>
+          <p class="qa-hunt-title" id="qa-hunt-title">Caça aos bugs · 0/5</p>
+          <p class="qa-hunt-help">Use os botões para capturar os bugs desta build.</p>
+          <ul class="qa-hunt-list" aria-labelledby="qa-hunt-title">
+            <li><button type="button" data-bug="cloud">#1</button></li>
+            <li><button type="button" data-bug="conquista">#2</button></li>
+            <li><button type="button" data-bug="idioma">#3</button></li>
+            <li><button type="button" data-bug="lootbox">#4</button></li>
+            <li><button type="button" data-bug="chat">#5</button></li>
+          </ul>
+        </div>
       </div>
       <p>QA pontual ou recorrente, conforme a fase e o escopo do jogo.</p>
     </aside>
@@ -31,7 +45,7 @@ description: "Serviços de QA para jogos independentes: testathons, QA sob deman
     </figure>
   </section>
 
-  <section class="qa-sales-section" aria-labelledby="qa-problems-title">
+  <section class="qa-sales-section" data-quest="problemas" aria-labelledby="qa-problems-title">
     <p class="eyebrow">Problemas encontrados durante o desenvolvimento</p>
     <h2 id="qa-problems-title">Uma falha pode interromper o jogo ou frustrar quem está jogando</h2>
     <ul class="qa-problem-list">
@@ -55,7 +69,7 @@ description: "Serviços de QA para jogos independentes: testathons, QA sob deman
     </div>
   </section>
 
-  <section class="qa-sales-section" id="como-ajudamos" aria-labelledby="qa-services-title">
+  <section class="qa-sales-section" id="como-ajudamos" data-quest="servicos" aria-labelledby="qa-services-title">
     <p class="eyebrow">Formas de trabalho</p>
     <h2 id="qa-services-title">Escolha o apoio que cabe na etapa do projeto</h2>
     <div class="qa-service-grid">
@@ -83,7 +97,51 @@ description: "Serviços de QA para jogos independentes: testathons, QA sob deman
     <p class="qa-service-footnote">Contratar QA não precisa significar um acompanhamento contínuo: é possível começar por uma necessidade pontual. Definimos objetivos, quantidade de QAs, horas, plataformas e entregáveis conforme o projeto e a disponibilidade.</p>
   </section>
 
-  <section class="qa-deliverables" aria-labelledby="qa-process-title">
+  <section class="qa-sales-section qa-cases" id="cases" data-quest="cases" aria-labelledby="qa-cases-title">
+    <p class="eyebrow">Hall de cases</p>
+    <h2 id="qa-cases-title">Jogos que já passaram pelo nosso QA</h2>
+    <p class="qa-cases-intro">Cada jogo tem prioridades diferentes. Um city builder de cartas, um FPS online e um roguelike tático multiplataforma pedem critérios, cenários e evidências diferentes: começamos pela regra que se aplica e pelo risco para quem joga.</p>
+    <ul class="qa-case-grid">
+      <li class="qa-case">
+        <p class="qa-case-tag">Testado pelo HUB</p>
+        <h3>Eco City Planner</h3>
+        <p class="qa-case-meta">Cartas e construção de cidades · PC · Steam</p>
+        <dl>
+          <div><dt>Foco</dt><dd>Coerência entre a página da loja e a build.</dd></div>
+          <div><dt>O que avaliamos</dt><dd>Save em conflito de Steam Cloud, conquistas, tutorial nos oito idiomas anunciados e requisitos de sistema.</dd></div>
+          <div><dt>Prioridade</dt><dd>Esclarecer a matriz de suporte de sistema e testar a promessa definida.</dd></div>
+        </dl>
+      </li>
+      <li class="qa-case">
+        <p class="qa-case-tag">Testado pelo HUB</p>
+        <h3>Aviãozinho do Tráfico 3</h3>
+        <p class="qa-case-meta">Joeveno · FPS retrô · PC · Steam</p>
+        <dl>
+          <div><dt>Foco</dt><dd>Superfície de conformidade de um jogo online.</dd></div>
+          <div><dt>O que avaliamos</dt><dd>Modos PvP, cooperativo e LAN, Workshop, idiomas, declarações de conteúdo e direitos dos assets.</dd></div>
+          <div><dt>Prioridade</dt><dd>Mapear a interação online e as responsabilidades sobre conteúdo da comunidade.</dd></div>
+        </dl>
+      </li>
+      <li class="qa-case">
+        <p class="qa-case-tag">Testado pelo HUB</p>
+        <h3>Endless Tactics: Trial Run</h3>
+        <p class="qa-case-meta">Dead Battery Games · Roguelike tático por turnos · PC · Steam</p>
+        <dl>
+          <div><dt>Foco</dt><dd>Prólogo gratuito lançado em Windows, Mac e Linux.</dd></div>
+          <div><dt>O que avaliamos</dt><dd>Inicialização nos três sistemas, turnos e ondas de criaturas, evacuação para a nave e progressão entre partidas.</dd></div>
+          <div><dt>Prioridade</dt><dd>Garantir que cada sistema anunciado na loja rode a mesma experiência.</dd></div>
+        </dl>
+      </li>
+      <li class="qa-case qa-case-yours">
+        <p class="qa-case-tag">Seu jogo</p>
+        <h3>Seu jogo pode ser o próximo</h3>
+        <p class="qa-case-meta">PC e mobile · escopo sob medida</p>
+        <a class="button" href="https://wa.me/5521988503103?text=Ol%C3%A1%21%20Quero%20que%20meu%20jogo%20entre%20para%20o%20Hall%20de%20cases%20do%20QA%20Game%20HUB." target="_blank" rel="noopener noreferrer">Quero meu jogo aqui ↗</a>
+      </li>
+    </ul>
+  </section>
+
+  <section class="qa-deliverables" data-quest="processo" aria-labelledby="qa-process-title">
     <div>
       <p class="eyebrow">Do primeiro contato ao relatório</p>
       <h2 id="qa-process-title">Como funciona</h2>
@@ -97,7 +155,7 @@ description: "Serviços de QA para jogos independentes: testathons, QA sob deman
     </ol>
   </section>
 
-  <section class="qa-ebook" aria-labelledby="qa-ebook-title">
+  <section class="qa-ebook" data-quest="ebook" aria-labelledby="qa-ebook-title">
     <div class="qa-ebook-copy">
       <p class="eyebrow">Material gratuito</p>
       <h2 id="qa-ebook-title">Fluxo de Validação — QA Game HUB</h2>
@@ -148,7 +206,7 @@ description: "Serviços de QA para jogos independentes: testathons, QA sob deman
     <a class="button" href="{{ site.qa_game_hub_whatsapp_url | escape }}" target="_blank" rel="noopener noreferrer">Consultar disponibilidade de QAs ↗</a>
   </section>
 
-  <section class="qa-sales-cta" aria-labelledby="qa-cta-title">
+  <section class="qa-sales-cta" data-quest="contato" aria-labelledby="qa-cta-title">
     <p class="eyebrow">Próximo passo</p>
     <h2 id="qa-cta-title">Vamos conversar sobre o seu jogo?</h2>
     <p>Conte em que etapa o projeto está, quais plataformas pretende atender e o que sua equipe quer testar. A partir disso, podemos conversar sobre um escopo adequado — pontual ou recorrente.</p>
@@ -156,3 +214,4 @@ description: "Serviços de QA para jogos independentes: testathons, QA sob deman
     <p class="qa-contact-note">O botão abre uma conversa no WhatsApp.</p>
   </section>
 </div>
+<script defer src="{{ '/assets/qa-game-hub-game.js' | relative_url }}"></script>
