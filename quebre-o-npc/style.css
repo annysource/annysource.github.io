@@ -1,0 +1,156 @@
+:root {
+  --fundo: #F4EDE0;
+  --painel: #FBF7EF;
+  --linha: #D9CCB4;
+  --tinta: #1E1812;
+  --suave: #4E4334;
+  --acento: #A83A20;
+  --verde: #1F4A2E;
+  --jogador: #E3ECE4;
+  --npc: #FFFFFF;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--tinta);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 20px;
+  background: var(--verde);
+  color: #F4EDE0;
+}
+.topo h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: 26px; }
+.sub { margin: 0; opacity: 0.85; font-size: 14px; }
+.codigo { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.codigo input { width: 170px; }
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(360px, 1.6fr) minmax(280px, 1.1fr);
+  gap: 14px;
+  padding: 14px;
+  align-items: start;
+}
+@media (max-width: 1100px) {
+  .layout { grid-template-columns: 1fr; }
+}
+
+.painel {
+  background: var(--painel);
+  border: 1px solid var(--linha);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.painel h2 { margin: 6px 0 0; font-size: 17px; }
+.ajuda { margin: 0; font-size: 14px; color: var(--suave); }
+
+input[type="text"], input[type="password"], select, textarea {
+  width: 100%;
+  font: inherit;
+  color: var(--tinta);
+  background: #fff;
+  border: 1px solid var(--linha);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+textarea { resize: vertical; }
+:focus-visible { outline: 3px solid #D8AE55; outline-offset: 1px; }
+
+button {
+  font: inherit;
+  font-weight: 600;
+  border: 0;
+  border-radius: 6px;
+  padding: 9px 14px;
+  background: var(--acento);
+  color: #FFF3E4;
+  cursor: pointer;
+}
+button.sec { background: transparent; color: var(--acento); border: 1px solid var(--acento); font-weight: 500; }
+button.perigo { color: #7A2414; border-color: #7A2414; }
+button:disabled { opacity: 0.45; cursor: default; }
+
+/* NPCs */
+.npcs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.npc-op {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+  text-align: left; background: #fff; color: var(--tinta);
+  border: 2px solid var(--linha); font-weight: 500; padding: 10px;
+}
+.npc-op b { font-size: 16px; }
+.npc-op span { font-size: 13px; color: var(--suave); }
+.npc-op[aria-checked="true"] { border-color: var(--acento); background: #FFF6EC; }
+
+.missao-card {
+  background: #fff; border: 1px solid var(--linha); border-radius: 8px; padding: 10px 12px; font-size: 14px;
+}
+.missao-card p { margin: 4px 0; }
+.missao-card .tipo { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--acento); font-weight: 700; }
+
+.prompt-box summary { cursor: pointer; font-weight: 600; }
+.prompt-box textarea { font-family: Consolas, "Courier New", monospace; font-size: 13px; margin: 8px 0; }
+.tag-editado { background: #F9ECE7; color: var(--acento); border-radius: 99px; padding: 1px 8px; font-size: 12px; margin-left: 6px; }
+
+/* Chat */
+.chat { min-height: 70vh; }
+.chat-topo { display: flex; align-items: center; gap: 12px; }
+.chat-topo button { margin-left: auto; }
+.avatar {
+  width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  color: #fff; font-family: Georgia, serif; font-size: 22px; font-weight: 700; flex: none;
+}
+.meta { margin: 0; font-size: 13px; color: var(--suave); }
+
+.conversa {
+  flex: 1; min-height: 340px; max-height: 58vh; overflow-y: auto;
+  background: #F7F1E6; border: 1px solid var(--linha); border-radius: 8px;
+  padding: 12px; display: flex; flex-direction: column; gap: 10px;
+}
+.msg { max-width: 88%; padding: 9px 12px; border-radius: 10px; white-space: pre-wrap; word-wrap: break-word; }
+.msg .quem { display: block; font-size: 12px; font-weight: 700; color: var(--suave); margin-bottom: 2px; }
+.msg.jogador { align-self: flex-end; background: var(--jogador); }
+.msg.npc { align-self: flex-start; background: var(--npc); border: 1px solid var(--linha); }
+.msg.abertura { opacity: 0.8; font-style: italic; }
+.msg.erro { align-self: center; background: #FBEBEB; color: #7A2414; font-size: 14px; }
+.msg .tempo { display: block; font-size: 12px; color: var(--suave); margin-top: 4px; }
+.msg.pensando { color: var(--suave); font-style: italic; }
+
+.compositor { display: flex; gap: 8px; align-items: stretch; }
+.compositor textarea { flex: 1; }
+.acoes-chat, .acoes-ficha { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.status { font-size: 13px; color: var(--suave); }
+
+/* Ficha */
+.notas { display: flex; gap: 6px; }
+.nota { flex: 1; }
+.nota input { position: absolute; opacity: 0; }
+.nota span {
+  display: block; text-align: center; padding: 8px 4px; border: 2px solid var(--linha); border-radius: 8px;
+  background: #fff; cursor: pointer; font-size: 14px;
+}
+.nota input:checked + span { border-color: var(--acento); background: #FFF6EC; }
+.nota input:focus-visible + span { outline: 3px solid #D8AE55; }
+.campo { font-size: 14px; font-weight: 600; }
+
+.resumo { font-size: 14px; display: flex; flex-direction: column; gap: 4px; }
+.resumo div { background: #fff; border: 1px solid var(--linha); border-radius: 6px; padding: 6px 10px; }
+.tabela-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; }
+th, td { border: 1px solid var(--linha); padding: 5px 7px; text-align: left; vertical-align: top; }
+th { background: #EDE3D0; }
+
+.rodape { padding: 10px 20px 20px; font-size: 13px; color: var(--suave); text-align: center; }

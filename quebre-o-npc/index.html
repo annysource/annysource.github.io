@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quebre o NPC · laboratório de QA</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topo">
+    <div>
+      <h1>Quebre o NPC</h1>
+      <p class="sub">Laboratório de QA para NPCs com IA</p>
+    </div>
+    <div class="codigo">
+      <label for="codigo-turma">Código da turma</label>
+      <input id="codigo-turma" type="password" autocomplete="off" placeholder="está no quadro">
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- Coluna 1: escolha do NPC, missão e prompt -->
+    <section class="painel" aria-labelledby="t-config">
+      <h2 id="t-config">1. Escolham o NPC</h2>
+      <div class="npcs" id="lista-npcs" role="radiogroup" aria-label="Personagem"></div>
+
+      <h2>2. Escolham a missão</h2>
+      <select id="missao" aria-label="Missão"></select>
+      <div class="missao-card" id="missao-card"></div>
+
+      <details class="prompt-box">
+        <summary>Ver o prompt do NPC <span id="tag-editado" class="tag-editado" hidden>editado</span></summary>
+        <p class="ajuda">É isto que vai para a IA como “instruções do sistema” antes de cada conversa. Vocês podem editar para testar uma correção. Toda nota salva registra se o prompt era o original ou um editado.</p>
+        <textarea id="prompt" rows="14" spellcheck="false"></textarea>
+        <button type="button" id="restaurar" class="sec">Restaurar prompt original</button>
+      </details>
+    </section>
+
+    <!-- Coluna 2: conversa -->
+    <section class="painel chat" aria-labelledby="t-chat">
+      <div class="chat-topo">
+        <div class="avatar" id="avatar" aria-hidden="true">B</div>
+        <div>
+          <h2 id="t-chat"><span id="nome-npc">Bartô</span></h2>
+          <p class="meta" id="meta-tentativa">Tentativa 1 · 0 de 8 falas</p>
+        </div>
+        <button type="button" id="nova" class="sec">Nova tentativa</button>
+      </div>
+
+      <div class="conversa" id="conversa" aria-live="polite"></div>
+
+      <form id="form" class="compositor">
+        <textarea id="entrada" rows="2" maxlength="500" placeholder="Escreva como jogador… (Enter envia, Shift+Enter quebra linha)" aria-label="Sua fala"></textarea>
+        <button type="submit" id="enviar">Enviar</button>
+      </form>
+      <div class="acoes-chat">
+        <button type="button" id="regenerar" class="sec" disabled>Regenerar última resposta</button>
+        <button type="button" id="copiar-conversa" class="sec">Copiar conversa</button>
+        <span id="status" class="status" role="status"></span>
+      </div>
+    </section>
+
+    <!-- Coluna 3: ficha -->
+    <section class="painel" aria-labelledby="t-ficha">
+      <h2 id="t-ficha">3. Deem a nota</h2>
+      <p class="ajuda">Ao terminar uma tentativa, avaliem o NPC contra o “aguentou quando” da missão.</p>
+      <div class="notas" role="radiogroup" aria-label="Nota da tentativa">
+        <label class="nota"><input type="radio" name="nota" value="1"><span><b>1</b> aguentou</span></label>
+        <label class="nota"><input type="radio" name="nota" value="0.5"><span><b>0,5</b> vacilou</span></label>
+        <label class="nota"><input type="radio" name="nota" value="0"><span><b>0</b> quebrou</span></label>
+      </div>
+      <label class="campo" for="frase">Frase que mais funcionou</label>
+      <input id="frase" type="text" maxlength="200" placeholder="cole aqui a frase de vocês">
+      <button type="button" id="salvar">Salvar na ficha e abrir nova tentativa</button>
+
+      <h2>Ficha da dupla</h2>
+      <div id="resumo" class="resumo"></div>
+      <div class="tabela-wrap">
+        <table id="tabela">
+          <thead><tr><th>#</th><th>NPC</th><th>Missão</th><th>Nota</th><th>Frase</th><th>Prompt</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="acoes-ficha">
+        <button type="button" id="copiar-ficha" class="sec">Copiar ficha</button>
+        <button type="button" id="baixar-csv" class="sec">Baixar CSV</button>
+        <button type="button" id="limpar-ficha" class="sec perigo">Limpar ficha</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    Fora de jogo hoje: nada de ofensas, conteúdo sexual ou crime real. As conversas vão para um serviço de IA; não escrevam dados pessoais.
+    <br><a href="https://annysousa.dev/projetos/quebre-o-npc/">Sobre o projeto</a> · <a href="https://annysousa.dev/">Por Anny Sousa ↗</a>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="npcs.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
