@@ -384,6 +384,13 @@
     if (!base || base.indexOf("SEU-WORKER") !== -1) return;
     fetch(base).then(function (r) { return r.json(); }).then(function (d) {
       var lista = (d && d.provedores) || [];
+      var aviso = "";
+      // Worker em versão antiga: só informa a IA principal ("provedor"), sem a lista de modelos.
+      // O seletor aparece mesmo assim, com essa única IA, e avisa por que não há outras opções.
+      if (!lista.length && d && d.provedor) {
+        lista = [{ id: d.provedor, modelo: null, modelos: [] }];
+        aviso = "O Worker ainda não informa outras IAs: só a IA principal está disponível.";
+      }
       estado.provedores = lista;
       if (!lista.length) return;
       var sel = $("ia");
@@ -391,20 +398,28 @@
       lista.forEach(function (p) {
         var grupo = document.createElement("optgroup");
         grupo.label = NOMES_IA[p.id] || p.id;
-        (p.modelos && p.modelos.length ? p.modelos : [p.modelo]).forEach(function (m) {
+        (p.modelos && p.modelos.length ? p.modelos : [p.modelo || ""]).forEach(function (m) {
           var o = document.createElement("option");
           o.value = p.id + "|" + m;
-          o.textContent = (NOMES_IA[p.id] || p.id) + " · " + m;
+          o.textContent = (NOMES_IA[p.id] || p.id) + " · " + (m || "modelo padrão do Worker");
           grupo.appendChild(o);
         });
         sel.appendChild(grupo);
       });
       estado.provedor = lista[0].id;
-      estado.modelo = lista[0].modelo;
-      sel.value = estado.provedor + "|" + estado.modelo;
+      estado.modelo = lista[0].modelo || null;
+      sel.value = estado.provedor + "|" + (estado.modelo || "");
       $("bloco-ia").hidden = false;
+      $("aviso-ia").textContent = aviso;
+      $("aviso-ia").hidden = !aviso;
       renderCabecalho();
-    }).catch(function () { /* sem seletor: usa a IA principal */ });
+    }).catch(function () {
+      $("bloco-ia").hidden = false;
+      $("ia").innerHTML = "<option>Sem conexão com o Worker</option>";
+      $("ia").disabled = true;
+      $("aviso-ia").textContent = "Não consegui perguntar ao Worker quais IAs estão liberadas. Confira o endereço em config.js e a internet.";
+      $("aviso-ia").hidden = false;
+    });
   }
 
   // ---------- início ----------
@@ -417,10 +432,10 @@
     $("prompt").value = promptAtual();
 
     $("ia").addEventListener("change", function () {
-      if (estado.enviando) { $("ia").value = estado.provedor + "|" + estado.modelo; return; }
+      if (estado.enviando) { $("ia").value = estado.provedor + "|" + (estado.modelo || ""); return; }
       var partes = $("ia").value.split("|");
       estado.provedor = partes[0];
-      estado.modelo = partes.slice(1).join("|");
+      estado.modelo = partes.slice(1).join("|") || null;
       estado.ultimoModelo = "";
       if (estado.historico.length) novaTentativa(); else renderCabecalho();
     });

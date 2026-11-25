@@ -49,3 +49,15 @@ test('NPC: o site escolhe o modelo, mas só entre os liberados no Worker',async(
     assert.equal(calls[1].body.model,'gemini-b');
     r=await worker.fetch(req({code:'vagalume',provider:'anthropic',model:'modelo-caro-qualquer',system:'s',messages:msgs},ORIGIN,'/chat','POST','10.0.0.1'),multi);
     assert.equal(r.status,400);assert.equal(calls.length,2)})});
+test('NPC: o erro do provedor chega ao site com o detalhe, e a OpenAI ganha uma segunda tentativa simples',async()=>{const multi={...env,OPENAI_API_KEY:'ko',OPENAI_MODEL:'gpt-x'};
+  let n=0;
+  await withProvider(()=>{n++;return n===1?new Response(JSON.stringify({error:{message:"Unsupported parameter: 'reasoning_effort'"}}),{status:400}):ok('resposta simples')},async calls=>{
+    const r=await worker.fetch(req({code:'vagalume',provider:'openai',system:'s',messages:msgs},ORIGIN,'/chat','POST','11.0.0.1'),multi);
+    assert.equal(r.status,200);assert.equal((await r.json()).text,'resposta simples');
+    assert.equal('reasoning_effort' in calls[1].body,false);assert.equal('max_completion_tokens' in calls[1].body,false)});
+  await withProvider(()=>new Response(JSON.stringify({error:{message:'The model gpt-x does not exist (key sk-abc123)'}}),{status:404}),async()=>{
+    const r=await worker.fetch(req({code:'vagalume',provider:'openai',system:'s',messages:msgs},ORIGIN,'/chat','POST','11.0.0.2'),multi);
+    const e=(await r.json()).error;assert.equal(r.status,502);assert.match(e,/erro 404/);assert.match(e,/does not exist/);assert.doesNotMatch(e,/sk-abc123/)});
+  await withProvider(()=>new Response(JSON.stringify({choices:[{message:{content:''},finish_reason:'length'}]}),{status:200}),async()=>{
+    const r=await worker.fetch(req({code:'vagalume',provider:'openai',system:'s',messages:msgs},ORIGIN,'/chat','POST','11.0.0.3'),multi);
+    assert.match((await r.json()).error,/MAX_TOKENS/)})});

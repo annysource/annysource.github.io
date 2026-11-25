@@ -157,26 +157,48 @@ async function chamarProvedor(provedor, config, env, system, messages, signal) {
     corpo.max_completion_tokens = maxTokens;
     corpo.reasoning_effort = env.OPENAI_REASONING_EFFORT || "low";
   }
-  const r = await fetch(base.url, {
+  const enviar = (c) => fetch(base.url, {
     method: "POST",
     signal,
     headers: { "Content-Type": "application/json", "Authorization": "Bearer " + config.chave },
-    body: JSON.stringify(corpo)
+    body: JSON.stringify(c)
   });
-  const d = await r.json().catch(() => ({}));
+  let r = await enviar(corpo);
+  let d = await r.json().catch(() => ({}));
+  // Se a OpenAI recusar um parâmetro (400), tenta uma vez só com o essencial.
+  if (!r.ok && r.status === 400 && provedor === "openai") {
+    console.log("openai recusou parâmetros, tentando pedido simples", JSON.stringify(d.error || d));
+    r = await enviar({ model: modelo, messages: corpo.messages });
+    d = await r.json().catch(() => ({}));
+  }
   if (!r.ok) throw erroDoProvedor(r.status, d);
-  const texto = (((d.choices || [])[0] || {}).message || {}).content;
+  const escolha = (d.choices || [])[0] || {};
+  const texto = (escolha.message || {}).content;
+  if (!texto && escolha.finish_reason === "length") {
+    const e = new Error("A IA gastou todo o limite pensando e não sobrou resposta. Aumente MAX_TOKENS no Worker.");
+    e.status = 502;
+    throw e;
+  }
   return { texto: (typeof texto === "string" ? texto : "").trim(), modelo };
 }
 
+// A mensagem do provedor (OpenAI, Gemini, Anthropic) explica a causa e não contém a chave,
+// então vai junto para o site, cortada em 220 caracteres.
+function mensagemDoProvedor(dados) {
+  const bruto = Array.isArray(dados) ? dados[0] : dados;
+  const erro = bruto && (bruto.error || bruto);
+  const msg = erro && (erro.message || erro.code || erro.type);
+  return msg ? String(msg).replace(/sk-[A-Za-z0-9_-]+/g, "sk-…").slice(0, 220) : "";
+}
+
 function erroDoProvedor(status, dados) {
-  const e = new Error(
-    status === 429
-      ? "Muita gente falando com a IA ao mesmo tempo. Esperem uns segundos e tentem de novo."
-      : status === 401 || status === 403
-        ? "A chave da IA no Worker foi recusada. Avise a professora."
-        : "A IA respondeu com erro " + status + "."
-  );
+  const detalhe = mensagemDoProvedor(dados);
+  const base = status === 429
+    ? "Muita gente falando com a IA ao mesmo tempo (ou a conta da IA está sem crédito). Esperem uns segundos e tentem de novo."
+    : status === 401 || status === 403
+      ? "A chave da IA no Worker foi recusada. Avise a professora."
+      : "A IA respondeu com erro " + status + ".";
+  const e = new Error(detalhe ? base + " Detalhe: " + detalhe : base);
   e.status = status === 429 ? 429 : 502;
   e.detalhe = dados && (dados.error || dados);
   return e;
