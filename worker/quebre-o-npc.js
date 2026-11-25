@@ -3,10 +3,15 @@
 // Ele guarda a chave da IA (como segredo), confere o código da turma e limita o uso.
 //
 // Variáveis (Settings > Variables and Secrets no painel do Cloudflare):
-//   API_KEY          (Secret)  chave do provedor de IA
+//   API_KEY          (Secret)  chave da IA principal (a do PROVIDER)
 //   CLASS_CODE       (Secret)  código da turma que você escreve no quadro
-//   PROVIDER         (Text)    "gemini" (padrão), "anthropic" ou "openai"
-//   MODEL            (Text)    opcional: nome do modelo; se vazio, usa o padrão do provedor
+//   PROVIDER         (Text)    IA principal: "gemini" (padrão), "anthropic" (Claude) ou "openai" (GPT)
+//   MODEL            (Text)    opcional: modelo da IA principal; se vazio, usa o padrão do provedor
+//
+// Para oferecer mais de uma IA ao mesmo tempo (o site mostra um seletor), adicione as chaves extras:
+//   GEMINI_API_KEY, ANTHROPIC_API_KEY, OPENAI_API_KEY        (Secret)
+//   GEMINI_MODEL,   ANTHROPIC_MODEL,   OPENAI_MODEL           (Text, opcionais)
+//   OPENAI_REASONING_EFFORT  (Text, opcional) nível de raciocínio do GPT: "low" (padrão, = "Leve"), "medium"…
 //   ALLOWED_ORIGINS  (Text)    endereço(s) do site, separados por vírgula. Ex.: https://annysousa.dev
 //   TEMPERATURE      (Text)    opcional, padrão 0.9
 //   MAX_TOKENS       (Text)    opcional, padrão 1024
@@ -89,11 +94,25 @@ function validar(corpo) {
   return null;
 }
 
-async function chamarProvedor(env, system, messages, signal) {
-  const provedor = (env.PROVIDER || "gemini").toLowerCase();
+// Quais IAs estão configuradas: { gemini: {chave, modelo}, ... }, com a principal primeiro.
+function provedoresDisponiveis(env) {
+  const principal = (env.PROVIDER || "gemini").toLowerCase();
+  const lista = {};
+  if (env.API_KEY && PADROES[principal]) lista[principal] = { chave: env.API_KEY, modelo: env.MODEL || null };
+  const extras = { gemini: "GEMINI", anthropic: "ANTHROPIC", openai: "OPENAI" };
+  Object.keys(extras).forEach((p) => {
+    const chave = env[extras[p] + "_API_KEY"];
+    if (!chave) return;
+    const modelo = env[extras[p] + "_MODEL"] || (lista[p] && lista[p].modelo) || null;
+    lista[p] = { chave, modelo };
+  });
+  Object.keys(lista).forEach((p) => { lista[p].modelo = lista[p].modelo || PADROES[p].modelo; });
+  return lista;
+}
+
+async function chamarProvedor(provedor, config, env, system, messages, signal) {
   const base = PADROES[provedor];
-  if (!base) throw new Error("PROVIDER inválido no Worker: use gemini, anthropic ou openai.");
-  const modelo = env.MODEL || base.modelo;
+  const modelo = config.modelo;
   const temperatura = Number(env.TEMPERATURE || 0.9);
   const maxTokens = Number(env.MAX_TOKENS || 1024);
 
@@ -103,7 +122,7 @@ async function chamarProvedor(env, system, messages, signal) {
       signal,
       headers: {
         "content-type": "application/json",
-        "x-api-key": env.API_KEY,
+        "x-api-key": config.chave,
         "anthropic-version": "2023-06-01"
       },
       body: JSON.stringify({ model: modelo, max_tokens: maxTokens, temperature: temperatura, system, messages })
@@ -117,15 +136,22 @@ async function chamarProvedor(env, system, messages, signal) {
   // Gemini (endpoint compatível com OpenAI) e OpenAI usam o mesmo formato.
   const corpo = {
     model: modelo,
-    temperature: temperatura,
-    max_tokens: maxTokens,
     messages: [{ role: "system", content: system }].concat(messages)
   };
-  if (provedor === "gemini") corpo.reasoning_effort = env.REASONING_EFFORT || "low";
+  if (provedor === "gemini") {
+    corpo.temperature = temperatura;
+    corpo.max_tokens = maxTokens;
+    corpo.reasoning_effort = env.REASONING_EFFORT || "low";
+  } else {
+    // Modelos de raciocínio da OpenAI (como o GPT-6.2 Sol) usam max_completion_tokens,
+    // não aceitam temperature e têm nível de raciocínio: "low" equivale ao "Leve" do ChatGPT.
+    corpo.max_completion_tokens = maxTokens;
+    corpo.reasoning_effort = env.OPENAI_REASONING_EFFORT || "low";
+  }
   const r = await fetch(base.url, {
     method: "POST",
     signal,
-    headers: { "Content-Type": "application/json", "Authorization": "Bearer " + env.API_KEY },
+    headers: { "Content-Type": "application/json", "Authorization": "Bearer " + config.chave },
     body: JSON.stringify(corpo)
   });
   const d = await r.json().catch(() => ({}));
@@ -156,11 +182,18 @@ export default {
 
     const url = new URL(request.url);
     if (request.method === "GET" && url.pathname === "/") {
-      return resposta(200, { ok: true, servico: "Quebre o NPC", provedor: env.PROVIDER || "gemini" }, cors.headers);
+      const disp = provedoresDisponiveis(env);
+      return resposta(200, {
+        ok: true,
+        servico: "Quebre o NPC",
+        provedor: Object.keys(disp)[0] || null,
+        provedores: Object.keys(disp).map((p) => ({ id: p, modelo: disp[p].modelo }))
+      }, cors.headers);
     }
     if (request.method !== "POST" || url.pathname !== "/chat") return resposta(404, { error: "Rota não encontrada." }, cors.headers);
     if (!cors.ok) return resposta(403, { error: "Este site não está autorizado a usar o Worker (ALLOWED_ORIGINS)." }, cors.headers);
-    if (!env.API_KEY) return resposta(500, { error: "O Worker está sem API_KEY configurada." }, cors.headers);
+    const disponiveis = provedoresDisponiveis(env);
+    if (!Object.keys(disponiveis).length) return resposta(500, { error: "O Worker está sem nenhuma chave de IA configurada." }, cors.headers);
 
     let corpo;
     try { corpo = await request.json(); } catch (e) { return resposta(400, { error: "Pedido inválido." }, cors.headers); }
@@ -168,6 +201,9 @@ export default {
     if (env.CLASS_CODE && String(corpo.code || "").trim() !== String(env.CLASS_CODE).trim()) {
       return resposta(401, { error: "Código da turma incorreto. Confiram o código no quadro." }, cors.headers);
     }
+
+    const provedor = corpo.provider ? String(corpo.provider).toLowerCase() : Object.keys(disponiveis)[0];
+    if (!disponiveis[provedor]) return resposta(400, { error: "Essa IA não está configurada no Worker." }, cors.headers);
 
     const problema = validar(corpo);
     if (problema) return resposta(400, { error: problema }, cors.headers);
@@ -179,9 +215,9 @@ export default {
     const relogio = setTimeout(() => controle.abort(), LIMITES.timeoutMs);
     const inicio = Date.now();
     try {
-      const { texto, modelo } = await chamarProvedor(env, corpo.system, corpo.messages, controle.signal);
+      const { texto, modelo } = await chamarProvedor(provedor, disponiveis[provedor], env, corpo.system, corpo.messages, controle.signal);
       if (!texto) return resposta(502, { error: "A IA devolveu uma resposta vazia. Tentem Regenerar." }, cors.headers);
-      return resposta(200, { text: texto, model: modelo, ms: Date.now() - inicio }, cors.headers);
+      return resposta(200, { text: texto, provider: provedor, model: modelo, ms: Date.now() - inicio }, cors.headers);
     } catch (e) {
       if (e.name === "AbortError") return resposta(504, { error: "A IA demorou demais para responder. Tentem de novo." }, cors.headers);
       console.log("erro do provedor", e.status, JSON.stringify(e.detalhe || e.message));

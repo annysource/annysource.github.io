@@ -95,6 +95,9 @@ button:disabled { opacity: 0.45; cursor: default; }
 .npc-op span { font-size: 13px; color: var(--suave); }
 .npc-op[aria-checked="true"] { border-color: var(--acento); background: #FFF6EC; }
 
+.bloco-ia { display: flex; flex-direction: column; gap: 6px; }
+.bloco-ia[hidden] { display: none; }
+
 .missao-card {
   background: #fff; border: 1px solid var(--linha); border-radius: 8px; padding: 10px 12px; font-size: 14px;
 }

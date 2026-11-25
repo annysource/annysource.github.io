@@ -86,5 +86,6 @@ Laboratório de QA para NPCs com IA, usado na palestra sobre testes de NPCs com 
 - `quebre-o-npc/config.js`: somente a URL pública do Worker (`https://quebre-o-npc.sousa-annyc.workers.dev/chat`). Nunca coloque a chave da IA aqui.
 - O Worker é publicado pelo painel do Cloudflare (colar o código), não pelo `wrangler.jsonc`, que continua sendo do Bora marcar.
 - Variáveis do Worker: `API_KEY` (secret), `CLASS_CODE` (secret), `PROVIDER` (`gemini` ou `anthropic`), `ALLOWED_ORIGINS` (`https://annysousa.dev`), `MODEL` (opcional).
-- Depois da aula, troque o `CLASS_CODE` ou apague a `API_KEY`.
+- Para comparar IAs na mesma aula, adicione também `GEMINI_API_KEY`, `ANTHROPIC_API_KEY` e/ou `OPENAI_API_KEY` (secrets) e, se quiser, `GEMINI_MODEL`, `ANTHROPIC_MODEL`, `OPENAI_MODEL`. Com mais de uma IA configurada, o site mostra o seletor “IA testada” e a ficha registra a IA de cada tentativa.
+- Depois da aula, troque o `CLASS_CODE` ou apague as chaves.
 - `npm test` cobre o Worker com a IA simulada; não valida a IA real nem a implantação.

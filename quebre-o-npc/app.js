@@ -11,6 +11,7 @@
   var MISSOES = window.MISSOES;
 
   var $ = function (id) { return document.getElementById(id); };
+  var NOMES_IA = { gemini: "Gemini", anthropic: "Claude", openai: "GPT" };
 
   var estado = {
     npcId: "barto",
@@ -18,7 +19,10 @@
     prompts: {},          // prompt atual de cada NPC (pode estar editado)
     tentativa: 1,
     historico: [],        // [{role: "user"|"assistant", content}]
-    enviando: false
+    enviando: false,
+    provedores: [],       // IAs configuradas no Worker: [{id, modelo}]
+    provedor: null,       // IA escolhida (null = a principal do Worker)
+    ultimoModelo: ""      // modelo que respondeu por último
   };
 
   // ---------- armazenamento (pode falhar em alguns navegadores: tudo em try/catch) ----------
@@ -45,6 +49,10 @@
   }
   function promptAtual() { return estado.prompts[estado.npcId]; }
   function promptEditado() { return promptAtual() !== npc().prompt; }
+  function nomeIA() {
+    var id = estado.provedor || (estado.provedores[0] && estado.provedores[0].id);
+    return id ? (NOMES_IA[id] || id) : "IA";
+  }
   function falasDoJogador() {
     var n = 0;
     estado.historico.forEach(function (m) { if (m.role === "user") n++; });
@@ -109,6 +117,7 @@
     $("avatar").style.background = n.cor;
     $("meta-tentativa").textContent =
       "Tentativa " + estado.tentativa + " · " + falasDoJogador() + " de " + MAX_FALAS + " falas" +
+      (estado.provedores.length > 1 ? " · " + nomeIA() : "") +
       (promptEditado() ? " · prompt editado" : "");
     $("tag-editado").hidden = !promptEditado();
   }
@@ -183,6 +192,7 @@
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         code: codigo,
+        provider: estado.provedor || undefined,
         system: promptAtual(),
         messages: estado.historico.map(function (m) { return { role: m.role, content: m.content }; })
       })
@@ -191,6 +201,7 @@
         if (!res.ok || !dados.text) {
           throw new Error(dados.error || ("O servidor respondeu com erro " + res.status + "."));
         }
+        if (dados.model) estado.ultimoModelo = dados.model;
         return { texto: dados.text, tempo: Date.now() - inicio };
       });
     });
@@ -250,7 +261,7 @@
 
   function textoDaConversa() {
     var linhas = [
-      "NPC: " + npc().nome + " · Missão " + missao().id + " (" + missao().nome + ") · Tentativa " + estado.tentativa +
+      "NPC: " + npc().nome + " · IA: " + nomeIA() + (estado.ultimoModelo ? " (" + estado.ultimoModelo + ")" : "") + " · Missão " + missao().id + " (" + missao().nome + ") · Tentativa " + estado.tentativa +
       " · Prompt " + (promptEditado() ? "editado" : "original")
     ];
     estado.historico.forEach(function (m) {
@@ -280,6 +291,7 @@
     ficha.push({
       n: ficha.length + 1,
       npc: npc().nome,
+      ia: nomeIA() + (estado.ultimoModelo ? " (" + estado.ultimoModelo + ")" : ""),
       missao: missao().id + " · " + missao().nome,
       nota: Number(marcada.value),
       frase: $("frase").value.trim(),
@@ -304,7 +316,7 @@
     corpo.innerHTML = "";
     ficha.forEach(function (r) {
       var tr = document.createElement("tr");
-      [r.n, r.npc, r.missao, notaTexto(r.nota), r.frase || "—", r.prompt].forEach(function (v) {
+      [r.n, r.npc, r.ia || "—", r.missao, notaTexto(r.nota), r.frase || "—", r.prompt].forEach(function (v) {
         var td = document.createElement("td"); td.textContent = String(v); tr.appendChild(td);
       });
       corpo.appendChild(tr);
@@ -313,7 +325,7 @@
     // Resumo: por NPC + missão, quantas tentativas e quantas quebraram (nota 0).
     var grupos = {};
     ficha.forEach(function (r) {
-      var k = r.npc + " · missão " + r.missao;
+      var k = r.npc + (r.ia ? " · " + r.ia.split(" (")[0] : "") + " · missão " + r.missao;
       if (!grupos[k]) grupos[k] = { total: 0, quebrou: 0, vacilou: 0 };
       grupos[k].total++;
       if (r.nota === 0) grupos[k].quebrou++;
@@ -343,7 +355,7 @@
     $("resumo").querySelectorAll("div").forEach(function (d) { linhas.push(d.textContent); });
     linhas.push("");
     ficha.forEach(function (r) {
-      linhas.push("#" + r.n + " · " + r.npc + " · " + r.missao + " · nota " + notaTexto(r.nota) +
+      linhas.push("#" + r.n + " · " + r.npc + (r.ia ? " · " + r.ia : "") + " · " + r.missao + " · nota " + notaTexto(r.nota) +
         " · prompt " + r.prompt + (r.frase ? " · frase: " + r.frase : ""));
     });
     return linhas.join("\n");
@@ -352,9 +364,9 @@
   function baixarCsv() {
     var ficha = lerFicha();
     var esc = function (v) { return '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"'; };
-    var linhas = [["n", "hora", "npc", "missao", "nota", "frase", "prompt", "falas", "conversa"].join(";")];
+    var linhas = [["n", "hora", "npc", "ia", "missao", "nota", "frase", "prompt", "falas", "conversa"].join(";")];
     ficha.forEach(function (r) {
-      linhas.push([r.n, r.hora, r.npc, r.missao, notaTexto(r.nota), r.frase, r.prompt, r.falas, r.conversa].map(esc).join(";"));
+      linhas.push([r.n, r.hora, r.npc, r.ia, r.missao, notaTexto(r.nota), r.frase, r.prompt, r.falas, r.conversa].map(esc).join(";"));
     });
     var blob = new Blob(["﻿" + linhas.join("\r\n")], { type: "text/csv;charset=utf-8" });
     var a = document.createElement("a");
@@ -362,6 +374,29 @@
     a.download = "ficha-quebre-o-npc.csv";
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 0);
+  }
+
+  // Pergunta ao Worker quais IAs estão configuradas; com mais de uma, mostra o seletor.
+  function carregarProvedores() {
+    var base = String(CFG.WORKER_URL || "").replace(/\/chat\/?$/, "/");
+    if (!base || base.indexOf("SEU-WORKER") !== -1) return;
+    fetch(base).then(function (r) { return r.json(); }).then(function (d) {
+      var lista = (d && d.provedores) || [];
+      estado.provedores = lista;
+      if (lista.length < 2) return;
+      var sel = $("ia");
+      sel.innerHTML = "";
+      lista.forEach(function (p) {
+        var o = document.createElement("option");
+        o.value = p.id;
+        o.textContent = (NOMES_IA[p.id] || p.id) + (p.modelo ? " · " + p.modelo : "");
+        sel.appendChild(o);
+      });
+      estado.provedor = lista[0].id;
+      sel.value = estado.provedor;
+      $("bloco-ia").hidden = false;
+      renderCabecalho();
+    }).catch(function () { /* sem seletor: usa a IA principal */ });
   }
 
   // ---------- início ----------
@@ -373,6 +408,12 @@
     renderMissoes();
     $("prompt").value = promptAtual();
 
+    $("ia").addEventListener("change", function () {
+      if (estado.enviando) { $("ia").value = estado.provedor; return; }
+      estado.provedor = $("ia").value;
+      estado.ultimoModelo = "";
+      if (estado.historico.length) novaTentativa(); else renderCabecalho();
+    });
     $("missao").addEventListener("change", function () {
       estado.missaoId = Number($("missao").value);
       renderMissaoCard();
@@ -409,6 +450,7 @@
 
     renderTudo();
     renderFicha();
+    carregarProvedores();
   }
 
   init();
