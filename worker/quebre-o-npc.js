@@ -11,6 +11,9 @@
 // Para oferecer mais de uma IA ao mesmo tempo (o site mostra um seletor), adicione as chaves extras:
 //   GEMINI_API_KEY, ANTHROPIC_API_KEY, OPENAI_API_KEY        (Secret)
 //   GEMINI_MODEL,   ANTHROPIC_MODEL,   OPENAI_MODEL           (Text, opcionais)
+//   GEMINI_MODELS,  ANTHROPIC_MODELS,  OPENAI_MODELS          (Text, opcionais) modelos que o seletor do site
+//                    pode usar, separados por vírgula; o primeiro é o padrão. Ex.: claude-haiku-5-5,claude-sonnet-5-5
+//                    Sem essa lista, vale só o *_MODEL (ou o padrão do provedor; para o Claude: Haiku, Sonnet e Opus 5.5).
 //   OPENAI_REASONING_EFFORT  (Text, opcional) nível de raciocínio do GPT: "low" (padrão, = "Leve"), "medium"…
 //   ALLOWED_ORIGINS  (Text)    endereço(s) do site, separados por vírgula. Ex.: https://annysousa.dev
 //   TEMPERATURE      (Text)    opcional, padrão 0.9
@@ -23,11 +26,13 @@ const PADROES = {
   },
   openai: {
     url: "https://api.openai.com/v1/chat/completions",
-    modelo: "gpt-5.6-luna"
+    modelo: "gpt-6.2-sol"
   },
   anthropic: {
     url: "https://api.anthropic.com/v1/messages",
-    modelo: "claude-haiku-5-5"
+    modelo: "claude-haiku-5-5",
+    // Liberados por padrão no seletor do site (o primeiro é o padrão).
+    modelos: ["claude-haiku-5-5", "claude-sonnet-5-5", "claude-opus-5-5"]
   }
 };
 
@@ -94,19 +99,23 @@ function validar(corpo) {
   return null;
 }
 
-// Quais IAs estão configuradas: { gemini: {chave, modelo}, ... }, com a principal primeiro.
+// Quais IAs estão configuradas: { gemini: {chave, modelo, modelos}, ... }, com a principal primeiro.
+// "modelos" é a lista que o site pode escolher; "modelo" é o padrão (o primeiro da lista).
 function provedoresDisponiveis(env) {
   const principal = (env.PROVIDER || "gemini").toLowerCase();
+  const prefixo = { gemini: "GEMINI", anthropic: "ANTHROPIC", openai: "OPENAI" };
+  const chaves = {};
+  if (env.API_KEY && PADROES[principal]) chaves[principal] = env.API_KEY;
+  Object.keys(prefixo).forEach((p) => { if (env[prefixo[p] + "_API_KEY"]) chaves[p] = env[prefixo[p] + "_API_KEY"]; });
+
   const lista = {};
-  if (env.API_KEY && PADROES[principal]) lista[principal] = { chave: env.API_KEY, modelo: env.MODEL || null };
-  const extras = { gemini: "GEMINI", anthropic: "ANTHROPIC", openai: "OPENAI" };
-  Object.keys(extras).forEach((p) => {
-    const chave = env[extras[p] + "_API_KEY"];
-    if (!chave) return;
-    const modelo = env[extras[p] + "_MODEL"] || (lista[p] && lista[p].modelo) || null;
-    lista[p] = { chave, modelo };
+  Object.keys(chaves).forEach((p) => {
+    const listaEnv = String(env[prefixo[p] + "_MODELS"] || "").split(",").map((m) => m.trim()).filter(Boolean);
+    const unico = env[prefixo[p] + "_MODEL"] || (p === principal ? env.MODEL : "");
+    let modelos = listaEnv.length ? listaEnv : unico ? [unico] : (PADROES[p].modelos || [PADROES[p].modelo]);
+    modelos = modelos.filter((m, i) => modelos.indexOf(m) === i);
+    lista[p] = { chave: chaves[p], modelo: modelos[0], modelos };
   });
-  Object.keys(lista).forEach((p) => { lista[p].modelo = lista[p].modelo || PADROES[p].modelo; });
   return lista;
 }
 
@@ -187,7 +196,7 @@ export default {
         ok: true,
         servico: "Quebre o NPC",
         provedor: Object.keys(disp)[0] || null,
-        provedores: Object.keys(disp).map((p) => ({ id: p, modelo: disp[p].modelo }))
+        provedores: Object.keys(disp).map((p) => ({ id: p, modelo: disp[p].modelo, modelos: disp[p].modelos }))
       }, cors.headers);
     }
     if (request.method !== "POST" || url.pathname !== "/chat") return resposta(404, { error: "Rota não encontrada." }, cors.headers);
@@ -204,6 +213,10 @@ export default {
 
     const provedor = corpo.provider ? String(corpo.provider).toLowerCase() : Object.keys(disponiveis)[0];
     if (!disponiveis[provedor]) return resposta(400, { error: "Essa IA não está configurada no Worker." }, cors.headers);
+    const modeloPedido = corpo.model ? String(corpo.model).trim() : disponiveis[provedor].modelo;
+    if (!disponiveis[provedor].modelos.includes(modeloPedido)) {
+      return resposta(400, { error: "Esse modelo não está liberado no Worker." }, cors.headers);
+    }
 
     const problema = validar(corpo);
     if (problema) return resposta(400, { error: problema }, cors.headers);
@@ -215,7 +228,7 @@ export default {
     const relogio = setTimeout(() => controle.abort(), LIMITES.timeoutMs);
     const inicio = Date.now();
     try {
-      const { texto, modelo } = await chamarProvedor(provedor, disponiveis[provedor], env, corpo.system, corpo.messages, controle.signal);
+      const { texto, modelo } = await chamarProvedor(provedor, { chave: disponiveis[provedor].chave, modelo: modeloPedido }, env, corpo.system, corpo.messages, controle.signal);
       if (!texto) return resposta(502, { error: "A IA devolveu uma resposta vazia. Tentem Regenerar." }, cors.headers);
       return resposta(200, { text: texto, provider: provedor, model: modelo, ms: Date.now() - inicio }, cors.headers);
     } catch (e) {

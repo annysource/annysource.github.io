@@ -22,6 +22,7 @@
     enviando: false,
     provedores: [],       // IAs configuradas no Worker: [{id, modelo}]
     provedor: null,       // IA escolhida (null = a principal do Worker)
+    modelo: null,         // modelo escolhido no seletor (null = o padrão do Worker)
     ultimoModelo: ""      // modelo que respondeu por último
   };
 
@@ -117,7 +118,7 @@
     $("avatar").style.background = n.cor;
     $("meta-tentativa").textContent =
       "Tentativa " + estado.tentativa + " · " + falasDoJogador() + " de " + MAX_FALAS + " falas" +
-      (estado.provedores.length > 1 ? " · " + nomeIA() : "") +
+      (estado.modelo ? " · " + nomeIA() + " (" + estado.modelo + ")" : "") +
       (promptEditado() ? " · prompt editado" : "");
     $("tag-editado").hidden = !promptEditado();
   }
@@ -193,6 +194,7 @@
       body: JSON.stringify({
         code: codigo,
         provider: estado.provedor || undefined,
+        model: estado.modelo || undefined,
         system: promptAtual(),
         messages: estado.historico.map(function (m) { return { role: m.role, content: m.content }; })
       })
@@ -376,24 +378,30 @@
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 0);
   }
 
-  // Pergunta ao Worker quais IAs estão configuradas; com mais de uma, mostra o seletor.
+  // Pergunta ao Worker quais IAs e modelos estão liberados e monta o seletor "IA e modelo".
   function carregarProvedores() {
     var base = String(CFG.WORKER_URL || "").replace(/\/chat\/?$/, "/");
     if (!base || base.indexOf("SEU-WORKER") !== -1) return;
     fetch(base).then(function (r) { return r.json(); }).then(function (d) {
       var lista = (d && d.provedores) || [];
       estado.provedores = lista;
-      if (lista.length < 2) return;
+      if (!lista.length) return;
       var sel = $("ia");
       sel.innerHTML = "";
       lista.forEach(function (p) {
-        var o = document.createElement("option");
-        o.value = p.id;
-        o.textContent = (NOMES_IA[p.id] || p.id) + (p.modelo ? " · " + p.modelo : "");
-        sel.appendChild(o);
+        var grupo = document.createElement("optgroup");
+        grupo.label = NOMES_IA[p.id] || p.id;
+        (p.modelos && p.modelos.length ? p.modelos : [p.modelo]).forEach(function (m) {
+          var o = document.createElement("option");
+          o.value = p.id + "|" + m;
+          o.textContent = (NOMES_IA[p.id] || p.id) + " · " + m;
+          grupo.appendChild(o);
+        });
+        sel.appendChild(grupo);
       });
       estado.provedor = lista[0].id;
-      sel.value = estado.provedor;
+      estado.modelo = lista[0].modelo;
+      sel.value = estado.provedor + "|" + estado.modelo;
       $("bloco-ia").hidden = false;
       renderCabecalho();
     }).catch(function () { /* sem seletor: usa a IA principal */ });
@@ -409,8 +417,10 @@
     $("prompt").value = promptAtual();
 
     $("ia").addEventListener("change", function () {
-      if (estado.enviando) { $("ia").value = estado.provedor; return; }
-      estado.provedor = $("ia").value;
+      if (estado.enviando) { $("ia").value = estado.provedor + "|" + estado.modelo; return; }
+      var partes = $("ia").value.split("|");
+      estado.provedor = partes[0];
+      estado.modelo = partes.slice(1).join("|");
       estado.ultimoModelo = "";
       if (estado.historico.length) novaTentativa(); else renderCabecalho();
     });

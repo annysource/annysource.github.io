@@ -32,10 +32,20 @@ test('NPC: no máximo 20 pedidos por minuto por computador',async()=>{await with
   assert.equal(last.status,429)})});
 test('NPC: com várias chaves, o site escolhe a IA e o Worker recusa uma IA não configurada',async()=>{const multi={...env,ANTHROPIC_API_KEY:'ka',OPENAI_API_KEY:'ko',OPENAI_MODEL:'modelo-gpt'};
   const info=await(await worker.fetch(req(null,ORIGIN,'/','GET'),multi)).json();
-  assert.deepEqual(info.provedores.map(p=>p.id),['gemini','anthropic','openai']);assert.equal(info.provedores[2].modelo,'modelo-gpt');
+  assert.deepEqual(info.provedores.map(p=>p.id),['gemini','anthropic','openai']);assert.equal(info.provedores[2].modelo,'modelo-gpt');assert.deepEqual(info.provedores[1].modelos,['claude-haiku-5-5','claude-sonnet-5-5','claude-opus-5-5']);
   await withProvider(url=>String(url).includes('anthropic')?new Response(JSON.stringify({content:[{type:'text',text:'Claude aqui'}]}),{status:200}):ok('outro'),async calls=>{
     const r=await worker.fetch(req({code:'vagalume',provider:'anthropic',system:'s',messages:msgs},ORIGIN,'/chat','POST','8.8.8.8'),multi);
     const d=await r.json();assert.equal(d.text,'Claude aqui');assert.equal(d.provider,'anthropic');assert.equal(calls[0].init.headers['x-api-key'],'ka');
     const g=await worker.fetch(req({code:'vagalume',provider:'openai',system:'s',messages:msgs},ORIGIN,'/chat','POST','8.8.8.8'),multi);
     assert.equal(calls[1].init.headers.Authorization,'Bearer ko');assert.equal(calls[1].body.model,'modelo-gpt');assert.equal(calls[1].body.reasoning_effort,'low');assert.equal(calls[1].body.max_completion_tokens,1024);assert.equal('temperature' in calls[1].body,false);assert.equal(g.status,200)});
   assert.equal((await worker.fetch(req({code:'vagalume',provider:'anthropic',system:'s',messages:msgs},ORIGIN,'/chat','POST','9.9.9.9'),env)).status,400)});
+test('NPC: o site escolhe o modelo, mas só entre os liberados no Worker',async()=>{const multi={...env,ANTHROPIC_API_KEY:'ka',GEMINI_MODELS:'gemini-a, gemini-b'};
+  const info=await(await worker.fetch(req(null,ORIGIN,'/','GET'),multi)).json();
+  assert.deepEqual(info.provedores[0].modelos,['gemini-a','gemini-b']);assert.equal(info.provedores[0].modelo,'gemini-a');
+  await withProvider(url=>String(url).includes('anthropic')?new Response(JSON.stringify({content:[{type:'text',text:'ok'}]}),{status:200}):ok('ok'),async calls=>{
+    let r=await worker.fetch(req({code:'vagalume',provider:'anthropic',model:'claude-sonnet-5-5',system:'s',messages:msgs},ORIGIN,'/chat','POST','10.0.0.1'),multi);
+    assert.equal(r.status,200);assert.equal(calls[0].body.model,'claude-sonnet-5-5');assert.equal((await r.json()).model,'claude-sonnet-5-5');
+    r=await worker.fetch(req({code:'vagalume',provider:'gemini',model:'gemini-b',system:'s',messages:msgs},ORIGIN,'/chat','POST','10.0.0.1'),multi);
+    assert.equal(calls[1].body.model,'gemini-b');
+    r=await worker.fetch(req({code:'vagalume',provider:'anthropic',model:'modelo-caro-qualquer',system:'s',messages:msgs},ORIGIN,'/chat','POST','10.0.0.1'),multi);
+    assert.equal(r.status,400);assert.equal(calls.length,2)})});

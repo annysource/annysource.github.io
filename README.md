@@ -87,5 +87,6 @@ Laboratório de QA para NPCs com IA, usado na palestra sobre testes de NPCs com 
 - O Worker é publicado pelo painel do Cloudflare (colar o código), não pelo `wrangler.jsonc`, que continua sendo do Bora marcar.
 - Variáveis do Worker: `API_KEY` (secret), `CLASS_CODE` (secret), `PROVIDER` (`gemini` ou `anthropic`), `ALLOWED_ORIGINS` (`https://annysousa.dev`), `MODEL` (opcional).
 - Para comparar IAs na mesma aula, adicione também `GEMINI_API_KEY`, `ANTHROPIC_API_KEY` e/ou `OPENAI_API_KEY` (secrets) e, se quiser, `GEMINI_MODEL`, `ANTHROPIC_MODEL`, `OPENAI_MODEL`. Com mais de uma IA configurada, o site mostra o seletor “IA testada” e a ficha registra a IA de cada tentativa.
+- O seletor “IA e modelo” do site só oferece modelos liberados no Worker: `GEMINI_MODELS`, `ANTHROPIC_MODELS`, `OPENAI_MODELS` (separados por vírgula; o primeiro é o padrão). Sem lista, o Claude libera Haiku, Sonnet e Opus 5.5, e as outras IAs só o modelo padrão (ou o `*_MODEL`).
 - Depois da aula, troque o `CLASS_CODE` ou apague as chaves.
 - `npm test` cobre o Worker com a IA simulada; não valida a IA real nem a implantação.
